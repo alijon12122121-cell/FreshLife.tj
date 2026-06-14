@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshLife Parfum v4.0 | Cloud</title>
+    <title>FreshLife Parfum v4.1 | Cloud</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- Подключаем библиотеку Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -117,13 +116,12 @@
     <section class="hero">
         <div class="hero-content">
             <h1>FreshLife Parfum 2.0</h1>
-            <p>Премиальная парфюмерия и стойкий шлейф в облаке</p>
+            <p>Премиальная парфюмерия в облачной базе данных Таджикистана</p>
         </div>
     </section>
 
-    <!-- Панель Администратора -->
     <section class="admin-panel" id="adminPanel">
-        <h3><i class="fas fa-plus-circle"></i> Добавление нового товара в ОБЛАКО</h3>
+        <h3><i class="fas fa-plus-circle"></i> Добавление нового товара в базу «Парфюмери»</h3>
         <div class="admin-form">
             <div>
                 <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Фотография парфюма:</label>
@@ -176,7 +174,7 @@
     </footer>
 
     <script>
-        // Инициализация Supabase твоими ключами
+        // Подключаемся к твоей существующей таблице "Парфюмери"
         const SUPABASE_URL = 'https://bkrxtujthsdejsnemqdf.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrcnh0dWp0aHNkZWpzbmVtcWRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NTUzODMsImV4cCI6MjA5NzAzMTM4M30.1zSIniM-f-z4ZzEgwOX3bLK4B1A1BMNs8ZpPDumzW_Y';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -206,17 +204,17 @@
             }
         }
 
-        // Загрузка товаров из облака Supabase для ВСЕХ пользователей
+        // Загрузка товаров из таблицы "Парфюмери"
         async function loadProductsFromCloud() {
             const grid = document.getElementById('catalogGrid');
             try {
-                let { data, error } = await _supabase.from('perfumes').select('*').order('id', { ascending: false });
+                let { data, error } = await _supabase.from('Парфюмери').select('*').order('id', { ascending: false });
                 if (error) throw error;
                 products = data || [];
                 renderCatalog();
             } catch (err) {
                 console.error("Ошибка загрузки данных из Supabase:", err);
-                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:red; padding: 40px 0;">Ошибка подключения к базе данных.</p>`;
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:red; padding: 40px 0;">Ошибка подключения к таблице "Парфюмери".</p>`;
             }
         }
 
@@ -274,11 +272,11 @@
             }
         }
 
-        // Сохранение записи напрямую в таблицу Supabase
+        // Сохранение записи напрямую в таблицу "Парфюмери"
         async function saveProductToSupabase(title, category, price, imageSrc) {
             const btn = document.getElementById('addBtn');
             try {
-                const { data, error } = await _supabase.from('perfumes').insert([
+                const { data, error } = await _supabase.from('Парфюмери').insert([
                     { title: title, category: category, price: parseFloat(price), img: imageSrc }
                 ]);
                 
@@ -289,10 +287,10 @@
                 document.getElementById('prodImage').value = "";
 
                 alert("Товар успешно сохранен в облачную базу данных!");
-                await loadProductsFromCloud(); // Перезагружаем витрину из облака
+                await loadProductsFromCloud(); 
             } catch (err) {
                 console.error("Ошибка сохранения в Supabase:", err);
-                alert("Не удалось сохранить в облако. Проверь структуру таблицы 'perfumes'.");
+                alert("Не удалось сохранить в облако. Убедись, что колонки называются title, category, price, img.");
             } finally {
                 btn.innerText = "Добавить товар";
                 btn.disabled = false;
@@ -302,7 +300,7 @@
         function renderCatalog() {
             const grid = document.getElementById('catalogGrid');
             if(products.length === 0) {
-                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888; padding: 40px 0;">Каталог пуст. Товаров в облаке пока нет.</p>`;
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888; padding: 40px 0;">Каталог пуст. Товаров в таблице "Парфюмери" пока нет.</p>`;
                 return;
             }
             grid.innerHTML = products.map(p => `
@@ -398,7 +396,6 @@
             .catch(err => { console.error(err); alert("Ошибка сети."); });
         }
 
-        // Автоматическая загрузка товаров из базы данных при старте сайта
         loadProductsFromCloud();
     </script>
 </body>
