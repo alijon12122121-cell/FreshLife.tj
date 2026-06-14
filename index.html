@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshLife Parfum v3.8 | Премиум</title>
+    <title>FreshLife Parfum v4.0 | Cloud</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     
+    <!-- Подключаем библиотеку Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --primary: #1a3a2a;
@@ -114,12 +117,13 @@
     <section class="hero">
         <div class="hero-content">
             <h1>FreshLife Parfum 2.0</h1>
-            <p>Премиальная парфюмерия и стойкий шлейф по доступным ценам</p>
+            <p>Премиальная парфюмерия и стойкий шлейф в облаке</p>
         </div>
     </section>
 
+    <!-- Панель Администратора -->
     <section class="admin-panel" id="adminPanel">
-        <h3><i class="fas fa-plus-circle"></i> Добавление нового товара</h3>
+        <h3><i class="fas fa-plus-circle"></i> Добавление нового товара в ОБЛАКО</h3>
         <div class="admin-form">
             <div>
                 <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Фотография парфюма:</label>
@@ -172,10 +176,15 @@
     </footer>
 
     <script>
+        // Инициализация Supabase твоими ключами
+        const SUPABASE_URL = 'https://bkrxtujthsdejsnemqdf.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrcnh0dWp0aHNkZWpzbmVtcWRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NTUzODMsImV4cCI6MjA5NzAzMTM4M30.1zSIniM-f-z4ZzEgwOX3bLK4B1A1BMNs8ZpPDumzW_Y';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         const TELEGRAM_BOT_TOKEN = '8673017660:AAH_ghD8wO9tOGRKzOLwcFBJr1L5sr7beRM'; 
         const TELEGRAM_CHAT_ID = '7780614523'; 
 
-        let products = JSON.parse(localStorage.getItem('my_perfumes')) || [];
+        let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
 
@@ -197,7 +206,20 @@
             }
         }
 
-        // УЛЬТРА-ИСПРАВЛЕННАЯ ФУНКЦИЯ С СЖАТИЕМ КАРТИНОК
+        // Загрузка товаров из облака Supabase для ВСЕХ пользователей
+        async function loadProductsFromCloud() {
+            const grid = document.getElementById('catalogGrid');
+            try {
+                let { data, error } = await _supabase.from('perfumes').select('*').order('id', { ascending: false });
+                if (error) throw error;
+                products = data || [];
+                renderCatalog();
+            } catch (err) {
+                console.error("Ошибка загрузки данных из Supabase:", err);
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:red; padding: 40px 0;">Ошибка подключения к базе данных.</p>`;
+            }
+        }
+
         function addNewProduct() {
             const titleInput = document.getElementById('prodTitle');
             const catInput = document.getElementById('prodCat');
@@ -214,7 +236,7 @@
                 return;
             }
 
-            btn.innerText = "Добавление...";
+            btn.innerText = "Сохранение в облако...";
             btn.disabled = true;
 
             const defaultImg = "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=80";
@@ -224,7 +246,6 @@
                 reader.onload = function(e) {
                     let imgEl = new Image();
                     imgEl.onload = function() {
-                        // Создаем виртуальный холст для сжатия фото до 400px
                         let canvas = document.createElement('canvas');
                         let ctx = canvas.getContext('2d');
                         let max_size = 400;
@@ -240,52 +261,48 @@
                         canvas.height = height;
                         ctx.drawImage(imgEl, 0, 0, width, height);
                         
-                        // Получаем легкую строку фотографии
-                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                        saveProductObj(title, category, price, compressedDataUrl);
+                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        saveProductToSupabase(title, category, price, compressedDataUrl);
                     };
-                    imgEl.onerror = function() {
-                        saveProductObj(title, category, price, defaultImg);
-                    };
+                    imgEl.onerror = function() { saveProductToSupabase(title, category, price, defaultImg); };
                     imgEl.src = e.target.result;
                 };
-                reader.onerror = function() {
-                    saveProductObj(title, category, price, defaultImg);
-                };
+                reader.onerror = function() { saveProductToSupabase(title, category, price, defaultImg); };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                saveProductObj(title, category, price, defaultImg);
+                saveProductToSupabase(title, category, price, defaultImg);
             }
         }
 
-        function saveProductObj(title, category, price, imageSrc) {
+        // Сохранение записи напрямую в таблицу Supabase
+        async function saveProductToSupabase(title, category, price, imageSrc) {
             const btn = document.getElementById('addBtn');
-            const newProduct = { 
-                id: Date.now(), 
-                title: title, 
-                category: category, 
-                price: parseFloat(price), 
-                img: imageSrc 
-            };
+            try {
+                const { data, error } = await _supabase.from('perfumes').insert([
+                    { title: title, category: category, price: parseFloat(price), img: imageSrc }
+                ]);
+                
+                if (error) throw error;
 
-            products.push(newProduct);
-            localStorage.setItem('my_perfumes', JSON.stringify(products));
-            
-            document.getElementById('prodTitle').value = "";
-            document.getElementById('prodPrice').value = "";
-            document.getElementById('prodImage').value = "";
+                document.getElementById('prodTitle').value = "";
+                document.getElementById('prodPrice').value = "";
+                document.getElementById('prodImage').value = "";
 
-            btn.innerText = "Добавить товар";
-            btn.disabled = false;
-
-            renderCatalog();
-            alert("Товар успешно добавлен на витрину!");
+                alert("Товар успешно сохранен в облачную базу данных!");
+                await loadProductsFromCloud(); // Перезагружаем витрину из облака
+            } catch (err) {
+                console.error("Ошибка сохранения в Supabase:", err);
+                alert("Не удалось сохранить в облако. Проверь структуру таблицы 'perfumes'.");
+            } finally {
+                btn.innerText = "Добавить товар";
+                btn.disabled = false;
+            }
         }
 
         function renderCatalog() {
             const grid = document.getElementById('catalogGrid');
             if(products.length === 0) {
-                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888; padding: 40px 0;">Каталог пуст. Нажмите кнопку "Админ", чтобы добавить товары!</p>`;
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888; padding: 40px 0;">Каталог пуст. Товаров в облаке пока нет.</p>`;
                 return;
             }
             grid.innerHTML = products.map(p => `
@@ -340,7 +357,7 @@
             if(cart.length > 0) {
                 document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth' });
             } else {
-                alert("Ваша корзина пуста! Сначала выберите товар.");
+                alert("Ваша корзина пуста!");
             }
         }
 
@@ -349,21 +366,14 @@
             const phone = document.getElementById('buyerPhone').value;
 
             if(!name || !phone) {
-                alert("Пожалуйста, введите ваше имя и номер телефона!");
+                alert("Пожалуйста, заполните поля формы!");
                 return;
             }
 
             let totalSum = cart.reduce((sum, item) => sum + item.price, 0);
+            let message = `🔔 **НОВЫЙ ЗАКАЗ [FreshLife 2.0]**\n\n👤 **Покупатель:** ${name}\n📞 **Телефон:** ${phone}\n\n📦 **Товары:**\n`;
             
-            let message = `🔔 **НОВЫЙ ЗАКАЗ [FreshLife 2.0]**\n\n`;
-            message += `👤 **Покупатель:** ${name}\n`;
-            message += `📞 **Телефон:** ${phone}\n\n`;
-            message += `📦 **Товары:**\n`;
-            
-            cart.forEach((item, i) => {
-                message += `${i+1}. ${item.title} — ${item.price} TJS\n`;
-            });
-            
+            cart.forEach((item, i) => { message += `${i+1}. ${item.title} — ${item.price} TJS\n`; });
             message += `\n💰 **Сумма заказа:** ${totalSum} TJS`;
 
             const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -371,31 +381,25 @@
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    parse_mode: 'Markdown'
-                })
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
             })
             .then(response => {
                 if(response.ok) {
-                    alert("Спасибо! Ваш заказ принят. Мы свяжемся с вами в ближайшее время!");
+                    alert("Спасибо! Заказ принят!");
                     cart = [];
                     updateCartUI();
                     document.getElementById('cartSection').style.display = 'none';
                     document.getElementById('buyerName').value = "";
                     document.getElementById('buyerPhone').value = "";
                 } else {
-                    alert("Ошибка отправки! Убедитесь, что вы активировали вашего бота в Telegram.");
+                    alert("Ошибка отправки заказа.");
                 }
             })
-            .catch(err => {
-                console.error(err);
-                alert("Произошла ошибка сети.");
-            });
+            .catch(err => { console.error(err); alert("Ошибка сети."); });
         }
 
-        renderCatalog();
+        // Автоматическая загрузка товаров из базы данных при старте сайта
+        loadProductsFromCloud();
     </script>
 </body>
 </html>
