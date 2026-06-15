@@ -55,7 +55,7 @@
         .admin-panel h3 { margin-bottom: 15px; color: var(--primary); }
         .admin-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; align-items: end; }
         .admin-form input, .admin-form select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; width: 100%; }
-        .admin-form button { background: var(--primary); color: #fff; border: none; padding: 13px; cursor: pointer; border-radius: 6px; font-weight: 600; transition: var(--transition); }
+        .admin-form button { background: var(--primary); color: #fff; border: none; padding: 13px; cursor: pointer; border-radius: 6px; font-weight: 600; transition: var(--transition); grid-column: 1 / -1; }
         .admin-form button:hover { background: var(--accent); color: var(--primary); }
 
         .hero {
@@ -69,14 +69,15 @@
         .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: var(--primary); position: relative; }
         .section-title::after { content: ''; display: block; width: 50px; height: 3px; background: var(--accent); margin: 10px auto 0; }
         .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .product-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: var(--transition); }
+        .product-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: var(--transition); display: flex; flex-direction: column; }
         .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
         .product-img-box { height: 340px; background: #eee; position: relative; overflow: hidden; }
         .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
         .product-card:hover .product-img-box img { transform: scale(1.05); }
-        .product-info { padding: 25px; text-align: center; }
+        .product-info { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .product-category { font-size: 12px; text-transform: uppercase; color: #888; margin-bottom: 8px; letter-spacing: 1px; }
         .product-title { font-size: 19px; margin-bottom: 12px; color: var(--dark); font-weight: 600; }
+        .product-stock { font-size: 13px; color: #555; background: #f0f3f1; padding: 6px 10px; border-radius: 6px; margin-bottom: 15px; border-left: 3px solid var(--primary); text-align: left; }
         .product-price { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
         
         .btn-add-to-cart { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); }
@@ -140,8 +141,19 @@
                 </select>
             </div>
             <div>
+                <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Кол-во коробок:</label>
+                <input type="number" id="prodBoxes" value="0" min="0" oninput="updateAdminTotalPcs()">
+            </div>
+            <div>
+                <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Штук в 1 коробке:</label>
+                <input type="number" id="prodPcsPerBox" value="0" min="0" oninput="updateAdminTotalPcs()">
+            </div>
+            <div>
                 <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Цена (в сомони):</label>
                 <input type="number" id="prodPrice" placeholder="Цена в TJS">
+            </div>
+            <div style="grid-column: 1 / -1; margin-top: 5px; font-weight: 600; color: var(--primary); font-size: 14px;" id="adminTotalDisplay">
+                Итого штук будет добавлено: 0 шт.
             </div>
             <button id="addBtn" onclick="addNewProduct()">Добавить товар</button>
         </div>
@@ -174,7 +186,6 @@
     </footer>
 
     <script>
-        // Чистый коннект к английской таблице perfumes
         const SUPABASE_URL = 'https://bkrxtujthsdejsnemqdf.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrcnh0dWp0aHNkZWpzbmVtcWRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NTUzODMsImV4cCI6MjA5NzAzMTM4M30.1zSIniM-f-z4ZzEgwOX3bLK4B1A1BMNs8ZpPDumzW_Y';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -185,6 +196,12 @@
         let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
+
+        function updateAdminTotalPcs() {
+            const boxes = parseInt(document.getElementById('prodBoxes').value) || 0;
+            const pcs = parseInt(document.getElementById('prodPcsPerBox').value) || 0;
+            document.getElementById('adminTotalDisplay').innerText = `Итого штук будет добавлено: ${boxes * pcs} шт.`;
+        }
 
         function loginAdmin() {
             if (isAdminLoggedIn) {
@@ -221,12 +238,16 @@
             const titleInput = document.getElementById('prodTitle');
             const catInput = document.getElementById('prodCat');
             const priceInput = document.getElementById('prodPrice');
+            const boxesInput = document.getElementById('prodBoxes');
+            const pcsInput = document.getElementById('prodPcsPerBox');
             const fileInput = document.getElementById('prodImage');
             const btn = document.getElementById('addBtn');
 
             const title = titleInput.value.trim();
             const category = catInput.value;
             const price = priceInput.value.trim();
+            const boxes = parseInt(boxesInput.value) || 0;
+            const pcs_per_box = parseInt(pcsInput.value) || 0;
 
             if(!title || !price) {
                 alert("Пожалуйста, заполните название и цену товара!");
@@ -259,23 +280,30 @@
                         ctx.drawImage(imgEl, 0, 0, width, height);
                         
                         let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                        saveProductToSupabase(title, category, price, compressedDataUrl);
+                        saveProductToSupabase(title, category, price, boxes, pcs_per_box, compressedDataUrl);
                     };
-                    imgEl.onerror = function() { saveProductToSupabase(title, category, price, defaultImg); };
+                    imgEl.onerror = function() { saveProductToSupabase(title, category, price, boxes, pcs_per_box, defaultImg); };
                     imgEl.src = e.target.result;
                 };
-                reader.onerror = function() { saveProductToSupabase(title, category, price, defaultImg); };
+                reader.onerror = function() { saveProductToSupabase(title, category, price, boxes, pcs_per_box, defaultImg); };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                saveProductToSupabase(title, category, price, defaultImg);
+                saveProductToSupabase(title, category, price, boxes, pcs_per_box, defaultImg);
             }
         }
 
-        async function saveProductToSupabase(title, category, price, imageSrc) {
+        async function saveProductToSupabase(title, category, price, boxes, pcs_per_box, imageSrc) {
             const btn = document.getElementById('addBtn');
             try {
                 const { data, error } = await _supabase.from('perfumes').insert([
-                    { title: title, category: category, price: parseFloat(price), img: imageSrc }
+                    { 
+                        title: title, 
+                        category: category, 
+                        price: parseFloat(price), 
+                        img: imageSrc,
+                        boxes_count: boxes,
+                        pcs_per_box: pcs_per_box
+                    }
                 ]);
                 
                 if (error) throw error;
@@ -283,12 +311,15 @@
                 document.getElementById('prodTitle').value = "";
                 document.getElementById('prodPrice').value = "";
                 document.getElementById('prodImage').value = "";
+                document.getElementById('prodBoxes').value = "0";
+                document.getElementById('prodPcsPerBox').value = "0";
+                document.getElementById('adminTotalDisplay').innerText = "Итого штук будет добавлено: 0 шт.";
 
                 alert("Товар успешно сохранен в облачную базу данных!");
                 await loadProductsFromCloud(); 
             } catch (err) {
                 console.error("Ошибка сохранения в Supabase:", err);
-                alert("Не удалось сохранить в облако. Убедитесь, что таблица perfumes создана.");
+                alert("Не удалось сохранить в облако. Убедитесь, что колонки boxes_count и pcs_per_box добавлены в таблицу.");
             } finally {
                 btn.innerText = "Добавить товар";
                 btn.disabled = false;
@@ -301,19 +332,30 @@
                 grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888; padding: 40px 0;">Каталог пуст. Товаров в базе пока нет.</p>`;
                 return;
             }
-            grid.innerHTML = products.map(p => `
+            grid.innerHTML = products.map(p => {
+                const totalPcs = (p.boxes_count || 0) * (p.pcs_per_box || 0);
+                return `
                 <div class="product-card">
                     <div class="product-img-box">
                         <img src="${p.img}" alt="${p.title}">
                     </div>
                     <div class="product-info">
-                        <div class="product-category">${p.category}</div>
-                        <h3 class="product-title">${p.title}</h3>
-                        <div class="product-price">${p.price} TJS</div>
-                        <button class="btn-add-to-cart" onclick="addToCart(${p.id})">В корзину</button>
+                        <div>
+                            <div class="product-category">${p.category}</div>
+                            <h3 class="product-title">${p.title}</h3>
+                            <div class="product-stock">
+                                <i class="fas fa-box"></i> В наличии: <b>${p.boxes_count || 0}</b> кор. (по ${p.pcs_per_box || 0} шт.)<br>
+                                <i class="fas fa-layer-group"></i> Общий остаток: <b>${totalPcs}</b> шт.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="product-price">${p.price} TJS</div>
+                            <button class="btn-add-to-cart" onclick="addToCart(${p.id})">В корзину</button>
+                        </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function addToCart(id) {
