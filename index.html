@@ -255,3 +255,190 @@
             }
 
             btn.innerText = "Сохранение в облако...";
+            btn.disabled = true;
+
+            const defaultImg = "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=80";
+
+            if (fileInput.files && fileInput.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let imgEl = new Image();
+                    imgEl.onload = function() {
+                        let canvas = document.createElement('canvas');
+                        let ctx = canvas.getContext('2d');
+                        let max_size = 400;
+                        let width = imgEl.width;
+                        let height = imgEl.height;
+
+                        if (width > height) {
+                            if (width > max_size) { height *= max_size / width; width = max_size; }
+                        } else {
+                            if (height > max_size) { width *= max_size / height; height = max_size; }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(imgEl, 0, 0, width, height);
+                        
+                        let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        saveProductToSupabase(title, category, price, boxes, pcs_per_box, compressedDataUrl);
+                    };
+                    imgEl.onerror = function() { saveProductToSupabase(title, category, price, boxes, pcs_per_box, defaultImg); };
+                    imgEl.src = e.target.result;
+                };
+                reader.onerror = function() { saveProductToSupabase(title, category, price, boxes, pcs_per_box, defaultImg); };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                saveProductToSupabase(title, category, price, boxes, pcs_per_box, defaultImg);
+            }
+        }
+
+        async function saveProductToSupabase(title, category, price, boxes, pcs_per_box, imageSrc) {
+            const btn = document.getElementById('addBtn');
+            try {
+                // ИСПРАВЛЕНО: имена полей приведены к структуре таблицы Supabase, значения переведены в числа
+                const { data, error } = await _supabase.from('perfumes').insert([
+                    { 
+                        name: title, 
+                        description: category, // используем как категорию/описание
+                        price: parseFloat(price) || 0, 
+                        image_url: imageSrc,
+                        boxes_count: parseInt(boxes) || 0,
+                        pcs_per_box: parseInt(pcs_per_box) || 0
+                    }
+                ]);
+                
+                if (error) throw error;
+
+                document.getElementById('prodTitle').value = "";
+                document.getElementById('prodPrice').value = "";
+                document.getElementById('prodImage').value = "";
+                document.getElementById('prodBoxes').value = "0";
+                document.getElementById('prodPcsPerBox').value = "0";
+                document.getElementById('adminTotalDisplay').innerText = "Итого штук будет добавлено: 0 шт.";
+
+                alert("Товар успешно сохранен в облачную базу данных!");
+                await loadProductsFromCloud(); 
+            } catch (err) {
+                console.error("Ошибка сохранения в Supabase:", err);
+                alert("Не удалось сохранить в облако. Проверьте консоль браузера.");
+            } finally {
+                btn.innerText = "Добавить товар";
+                btn.disabled = false;
+            }
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById('catalogGrid');
+            if(products.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888; padding: 40px 0;">Каталог пуст. Товаров в базе пока нет.</p>`;
+                return;
+            }
+            grid.innerHTML = products.map(p => {
+                const totalPcs = (p.boxes_count || 0) * (p.pcs_per_box || 0);
+                // ИСПРАВЛЕНО: p.title -> p.name, p.img -> p.image_url, p.category -> p.description
+                return `
+                <div class="product-card">
+                    <div class="product-img-box">
+                        <img src="${p.image_url || 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=80'}" alt="${p.name || ''}">
+                    </div>
+                    <div class="product-info">
+                        <div>
+                            <div class="product-category">${p.description || 'Unisex'}</div>
+                            <h3 class="product-title">${p.name || 'Без названия'}</h3>
+                            <div class="product-stock">
+                                <i class="fas fa-box"></i> В наличии: <b>${p.boxes_count || 0}</b> - кор. (по ${p.pcs_per_box || 0} шт.)<br>
+                                <i class="fas fa-layer-group"></i> Общий остаток: <b>${totalPcs}</b> шт.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="product-price">${p.price || 0} TJS</div>
+                            <button class="btn-add-to-cart" onclick="addToCart(${p.id})">В корзину</button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function addToCart(id) {
+            const item = products.find(p => p.id === id);
+            if (item) {
+                cart.push(item);
+                updateCartUI();
+                document.getElementById('cartSection').style.display = 'block';
+            }
+        }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.length;
+            const container = document.getElementById('cartItemsContainer');
+            
+            container.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <div class="cart-item-details">
+                        <h4>${item.name || 'Парфюм'}</h4>
+                        <p>${item.price || 0} TJS</p>
+                    </div>
+                    <button class="remove-item" onclick="removeFromCart(${index})"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+            document.getElementById('cartTotalSum').innerText = `Итого: ${total} TJS`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+            if(cart.length === 0) document.getElementById('cartSection').style.display = 'none';
+        }
+
+        function scrollToCart() {
+            if(cart.length > 0) {
+                document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert("Ваша корзина пуста!");
+            }
+        }
+
+        function sendOrderToTelegram() {
+            const name = document.getElementById('buyerName').value;
+            const phone = document.getElementById('buyerPhone').value;
+
+            if(!name || !phone) {
+                alert("Пожалуйста, заполните поля формы!");
+                return;
+            }
+
+            let totalSum = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+            let message = `🔔 **НОВЫЙ ЗАКАЗ [FreshLife 2.0]**\n\n👤 **Покупатель:** ${name}\n📞 **Телефон:** ${phone}\n\n📦 **Товары:**\n`;
+            
+            cart.forEach((item, i) => { message += `${i+1}. ${item.name} — ${item.price} TJS\n`; });
+            message += `\n💰 **Сумма заказа:** ${totalSum} TJS`;
+
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+            })
+            .then(response => {
+                if(response.ok) {
+                    alert("Спасибо! Заказ принят!");
+                    cart = [];
+                    updateCartUI();
+                    document.getElementById('cartSection').style.display = 'none';
+                    document.getElementById('buyerName').value = "";
+                    document.getElementById('buyerPhone').value = "";
+                } else {
+                    alert("Ошибка отправки заказа.");
+                }
+            })
+            .catch(err => { console.error(err); alert("Ошибка сети."); });
+        }
+
+        loadProductsFromCloud();
+    </script>
+</body>
+</html>
