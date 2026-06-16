@@ -150,7 +150,6 @@
     <section class="hero">
         <div class="hero-content">
             <h1>FreshLife Parfum v6.0</h1>
-            <p>Фирменный контроль остатков, долгов и отчетов дня</p>
         </div>
     </section>
 
@@ -645,7 +644,7 @@
             .then(async response => {
                 if(response.ok) {
                     await updateStockInSupabase();
-                    alert("Готово! Данные обновлены в базе Supabase, заказ зафиксирован.");
+                    alert("Успешно ждите ответ.");
                     cart = [];
                     updateCartUI();
                     document.getElementById('cartSection').style.display = 'none';
