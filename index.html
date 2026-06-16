@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshLife Parfum v6.0 | Ultimate Admin & Customer System</title>
+    <title>FreshLife Parfum v7.4 | Пополнение склада онлайн</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     
@@ -19,6 +19,8 @@
             --danger: #ff4d4d;
             --success: #2e7d32;
             --warning: #ff9800;
+            --alif: #00b2a9;
+            --dc: #ff5722;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
@@ -61,14 +63,19 @@
         .admin-form button { background: var(--primary); color: #fff; border: none; padding: 13px; cursor: pointer; border-radius: 6px; font-weight: 600; transition: var(--transition); grid-column: 1 / -1; }
         .admin-form button:hover { background: var(--accent); color: var(--primary); }
 
-        /* Стили для кнопки и блока Отчета дня */
-        .btn-report { background: #3f51b5 !important; margin-top: 10px; }
-        .btn-report:hover { background: #303f9f !important; color: white !important; }
+        .btn-send-tg-report { background: #0088cc !important; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-send-tg-report:hover { background: #0077b3 !important; color: white !important; }
+        
         .report-section { background: #eef2f7; border: 1px solid #ced4da; padding: 20px; border-radius: 8px; margin-top: 20px; display: none; }
         .report-section h4 { color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
         .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
         .report-table th, .report-table td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 13px; }
         .report-table th { background: #f1f1f1; font-weight: 600; }
+
+        .btn-check-verify { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: 600; margin-top: 5px; display: inline-block; text-decoration: none; text-align: center; }
+        .btn-check-verify.copy-btn { background: var(--primary); margin-right: 5px; }
+        .btn-check-verify.view-btn { background: #e65100; }
+        .btn-check-verify:hover { opacity: 0.9; }
 
         .hero {
             height: 35vh; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
@@ -85,19 +92,27 @@
         .product-img-box { height: 340px; background: #eee; position: relative; overflow: hidden; }
         .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
         
+        /* КНОПКИ КУРАТОРСТВА ТОВАРАМИ */
+        .admin-controls-badges { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
         .admin-delete-btn {
-            position: absolute; top: 15px; right: 15px; background: rgba(255, 77, 77, 0.95); color: white;
-            border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: var(--transition); z-index: 10; font-size: 16px;
+            background: rgba(255, 77, 77, 0.95); color: white; border: none; border-radius: 50%; 
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: var(--transition); font-size: 16px;
         }
         .admin-delete-btn:hover { background: var(--danger); transform: scale(1.1); }
+        
+        .admin-refill-btn {
+            background: rgba(46, 125, 50, 0.95); color: white; border: none; border-radius: 50%; 
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: var(--transition); font-size: 16px;
+        }
+        .admin-refill-btn:hover { background: #1b5e20; transform: scale(1.1); }
 
         .product-info { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .product-category { font-size: 12px; text-transform: uppercase; color: #888; margin-bottom: 8px; letter-spacing: 1px; }
         .product-title { font-size: 19px; margin-bottom: 12px; color: var(--dark); font-weight: 600; }
         
         .product-stock { font-size: 14px; color: #333; background: #f0f3f1; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary); text-align: left; line-height: 1.5; }
-        .stock-future { font-size: 12px; color: var(--success); font-weight: 600; margin-top: 6px; display: block; border-top: 1px dashed #ccc; padding-top: 4px; }
         
         .product-price { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
         
@@ -120,8 +135,10 @@
         .cash-calculator h5 { color: var(--primary); margin-bottom: 12px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .cash-input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
         .cash-input-group label { font-size: 12px; color: #555; font-weight: 600; }
-        .cash-input-group input { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; font-weight: 600; width: 100%; background: #fff; }
+        .cash-input-group input, .cash-input-group select { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; font-weight: 600; width: 100%; background: #fff; }
         
+        .payment-info-box { background: #e3f2fd; padding: 14px; border-radius: 8px; margin-top: 8px; font-size: 14px; color: #0d47a1; border-left: 4px solid var(--dc); display: none; line-height: 1.5; }
+
         .debt-alert-box { padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 700; line-height: 1.4; margin-top: 10px; display: none; }
         .debt-alert-box.warning { background: #fff3e0; color: #e65100; border-left: 4px solid var(--warning); display: block; }
         .debt-alert-box.success { background: #e8f5e9; color: var(--success); border-left: 4px solid var(--success); display: block; }
@@ -131,6 +148,10 @@
         .order-form input { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
         .btn-order { background: #25D366; color: #fff; padding: 14px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 16px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; }
         
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
+        .modal-content { max-width: 90%; max-height: 85vh; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
+        .close-modal { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; }
+
         footer { background: var(--dark); color: #aaa; padding: 40px 5%; text-align: center; margin-top: 80px; font-size: 14px; border-top: 3px solid var(--accent); }
         footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
     </style>
@@ -149,7 +170,7 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>FreshLife Parfum v6.0</h1>
+            <h1>FreshLife Parfum</h1>
         </div>
     </section>
 
@@ -158,7 +179,7 @@
         <h3><i class="fas fa-plus-circle"></i> Панель управления</h3>
         <div class="admin-form">
             <div>
-                <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Фотография товара (HD без сжатия):</label>
+                <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Фотография товара:</label>
                 <input type="file" id="prodImage" accept="image/*">
             </div>
             <div>
@@ -168,9 +189,9 @@
             <div>
                 <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Категория:</label>
                 <select id="prodCat">
-                    <option value="Unisex">Unisex</option>
-                    <option value="For Her">For Her</option>
-                    <option value="For Him">For Him</option>
+                    <option value=""></option>
+                    <option value="For Her">For men</option>
+                    <option value="For Him">For women</option>
                 </select>
             </div>
             <div>
@@ -189,12 +210,17 @@
                 <input type="number" id="prodPrice" placeholder="Цена в TJS">
             </div>
             <button id="addBtn" onclick="addNewProduct()">Добавить товар в каталог</button>
-            <button class="btn-report" onclick="toggleDailyReport()"><i class="fas fa-chart-line"></i> Посмотреть Отчет Дня</button>
+            
+            <button class="btn-send-tg-report" id="sendTgReportBtn" onclick="sendDailyReportToTelegram()">
+                <i class="fab fa-telegram-plane"></i> 📊 Отправить отчёт дня в Telegram
+            </button>
+            
+            <button class="btn-report" onclick="toggleDailyReport()"><i class="fas fa-chart-line"></i> Посмотреть Отчет на сайте</button>
         </div>
 
-        <!-- ОТЧЕТ ДНЯ (ТОЛЬКО ДЛЯ АДМИНА) -->
+        <!-- ОТЧЕТ ДНЯ -->
         <div class="report-section" id="dailyReportBlock">
-            <h4><i class="fas fa-file-invoice-dollar"></i> Финансовый отчет за сегодня</h4>
+            <h4><i class="fas fa-file-invoice-dollar"></i> Финансовый отчет на экране</h4>
             <div id="reportSummary">Загрузка данных отчета...</div>
             <table class="report-table">
                 <thead>
@@ -202,9 +228,9 @@
                         <th>Время</th>
                         <th>Покупатель / Контакт</th>
                         <th>Что куплено</th>
-                        <th>Сумма заказа</th>
-                        <th>Внесено наличных</th>
-                        <th>Остаток долга</th>
+                        <th>Сумма / Долг</th>
+                        <th>Данные платежа</th>
+                        <th>Действие</th>
                     </tr>
                 </thead>
                 <tbody id="reportTableBody">
@@ -219,19 +245,39 @@
         <div class="product-grid" id="catalogGrid"></div>
     </section>
 
-    <!-- КОРЗИНА И РАСЧЕТ ДОЛГА (ВИДИТ И ПОКУПАТЕЛЬ, И АДМИН) -->
+    <!-- КОРЗИНА И РАСЧЕТ ДОЛГА -->
     <section class="cart-section" id="cartSection">
         <div class="cart-title"><i class="fas fa-shopping-basket"></i> Ваша корзина</div>
         <div id="cartItemsContainer"></div>
         <div class="cart-total" id="cartTotalSum">Итого: 0 TJS</div>
 
         <div class="cash-calculator">
-            <h5><i class="fas fa-wallet"></i> Расчет остатка и долга покупателя:</h5>
+            <h5><i class="fas fa-wallet"></i> Способ оплаты и верификация:</h5>
+            
+            <div class="cash-input-group" style="margin-bottom: 15px;">
+                <label>Выберите, как вы будете оплачивать:</label>
+                <select id="paymentMethod" onchange="handlePaymentMethodChange()">
+                    <option value="Наличные">Наличные (При встрече)</option>
+                    <option value="Через Алиф на мой DC">У меня кошелек Alif Mobi (Перевод на карту/кошелек DC)</option>
+                    <option value="Через DC на мой DC">У меня кошелек Dushanbe City (Прямой перевод)</option>
+                </select>
+                <div id="paymentDetailsBox" class="payment-info-box"></div>
+            </div>
+
+            <div class="cash-input-group" id="checkNumberGroup" style="display:none; margin-bottom: 15px;">
+                <label id="checkLabel">Введите номер чека / транзакции:</label>
+                <input type="text" id="paymentCheckNumber" placeholder="Пример: 87452319">
+            </div>
+
+            <div class="cash-input-group" id="checkScreenshotGroup" style="display:none; margin-bottom: 15px;">
+                <label style="color: var(--dc); font-weight: bold;"><i class="fas fa-camera"></i> Обязательно прикрепите скриншот чека об оплате:</label>
+                <input type="file" id="paymentScreenshot" accept="image/*" style="padding: 8px;">
+            </div>
+
             <div class="cash-input-group">
-                <label>Сколько наличных денег вносится СЕЙЧАС? (сомони):</label>
+                <label>Сколько денег вносится СЕЙЧАС? (сомони):</label>
                 <input type="number" id="cashGiven" placeholder="Введите сумму оплаты" oninput="calculateDebt()">
             </div>
-            <!-- Покупатель и админ четко видят долг прямо здесь -->
             <div id="debtResultBox" class="debt-alert-box"></div>
         </div>
 
@@ -246,6 +292,12 @@
             </div>
         </div>
     </section>
+
+    <!-- МОДАЛКА ПРОСМОТРА ЧЕКА -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal" onclick="closeCheckModal()">&times;</span>
+        <img class="modal-content" id="modalTargetImg">
+    </div>
 
     <footer>
         <p>&copy; 2026 FreshLife Parfum. Связь через WhatsApp: <a href="https://wa.me/992100011209" target="_blank">+992 10 001 1209</a></p>
@@ -262,7 +314,7 @@
         let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
-        let dailyOrdersLog = []; // Локальный лог продаж за текущую сессию для отчета дня
+        let dailyOrdersLog = [];
 
         function updateAdminUnitLabel() {
             const type = document.getElementById('prodUnitType').value;
@@ -282,10 +334,36 @@
                 isAdminLoggedIn = true;
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('adminLogBtn').innerHTML = `<i class="fas fa-user-shield"></i> Панель`;
-                alert("Доступ разрешен. Логика Админа активирована!");
+                alert("Доступ разрешен!");
                 renderCatalog();
             } else {
-                alert("Неверный логин или пароль!");
+                alert("Неверный пароль!");
+            }
+        }
+
+        function handlePaymentMethodChange() {
+            const method = document.getElementById('paymentMethod').value;
+            const detailsBox = document.getElementById('paymentDetailsBox');
+            const checkGroup = document.getElementById('checkNumberGroup');
+            const screenshotGroup = document.getElementById('checkScreenshotGroup');
+            const checkLabel = document.getElementById('checkLabel');
+
+            if (method !== "Наличные") {
+                detailsBox.style.display = "block";
+                checkGroup.style.display = "block";
+                screenshotGroup.style.display = "block";
+                
+                if (method === "Через Алиф на мой DC") {
+                    detailsBox.innerHTML = `📲 <b>Инструкция для Alif:</b> Переведите сумму на номер DC: <b>+992 10 001 1209</b>. Сделайте скриншот чека!`;
+                    checkLabel.innerText = "Введи номер чека / ID операции из приложения Алиф:";
+                } else {
+                    detailsBox.innerHTML = `📲 <b>Инструкция для DC:</b> Сделайте перевод на кошелек продавца по номеру: <b>+992 10 001 1209</b>. Сделайте скриншот!`;
+                    checkLabel.innerText = "Введи последние 4 цифры карты или номер чека DC:";
+                }
+            } else {
+                detailsBox.style.display = "none";
+                checkGroup.style.display = "none";
+                screenshotGroup.style.display = "none";
             }
         }
 
@@ -295,48 +373,60 @@
                 if (error) throw error;
                 products = data || [];
                 renderCatalog();
-            } catch (err) {
-                console.error("Ошибка соединения:", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function deleteProduct(id, name) {
-            if (!confirm(`Вы действительно хотите удалить товар "${name}"?`)) return;
+            if (!confirm(`Удалить "${name}"?`)) return;
             try {
                 await _supabase.from('perfumes').delete().eq('id', id);
-                alert("Удалено!");
                 await loadProductsFromCloud();
-            } catch (err) { alert("Ошибка удаления"); }
+            } catch (err) { alert("Ошибка"); }
+        }
+
+        // НОВАЯ ФУНКЦИЯ: ИЗМЕНЕНИЕ И ПОПОЛНЕНИЕ СКЛАДА
+        async function refillProductStock(id, currentStock, name, unit) {
+            const addedValue = prompt(`Товар: "${name}"\nСейчас на складе: ${currentStock} ${unit}.\n\nСколько еще ${unit} добавить на склад?`);
+            if (addedValue === null) return; // Нажал отмену
+            
+            const countToAdd = parseFloat(addedValue);
+            if (isNaN(countToAdd) || countToAdd <= 0) {
+                alert("Ошибка! Введите корректное число больше нуля.");
+                return;
+            }
+
+            const newStockValue = currentStock + countToAdd;
+
+            try {
+                const { error } = await _supabase
+                    .from('perfumes')
+                    .update({ boxes_count: newStockValue })
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert(`Склад успешно пополнен! Теперь в наличии: ${newStockValue} ${unit}.`);
+                await loadProductsFromCloud(); // Перерисовать каталог с новыми данными
+            } catch (err) {
+                alert("Не удалось обновить склад: " + err.message);
+            }
         }
 
         async function saveProductToSupabase(title, category, price, stockValue, unitType, imageSrc) {
             const btn = document.getElementById('addBtn');
             try {
                 const payload = { 
-                    name: title, 
-                    description: category, 
-                    price: price, 
-                    image_url: imageSrc,
-                    boxes_count: stockValue, 
-                    pcs_per_box: unitType === 'коробок' ? 0 : 1
+                    name: title, description: category, price: price, image_url: imageSrc,
+                    boxes_count: stockValue, pcs_per_box: unitType === 'коробок' ? 0 : 1
                 };
-
-                const { error } = await _supabase.from('perfumes').insert([payload]);
-                if (error) throw error;
-
+                await _supabase.from('perfumes').insert([payload]);
                 document.getElementById('prodTitle').value = "";
                 document.getElementById('prodPrice').value = "";
                 document.getElementById('prodImage').value = "";
-                document.getElementById('prodBoxes').value = "0";
-
-                alert("Товар сохранен в исходном качестве HD!");
+                alert("Успешно!");
                 await loadProductsFromCloud(); 
-            } catch (err) {
-                alert(`Ошибка: ${err.message}`);
-            } finally {
-                btn.innerText = "Добавить товар в каталог";
-                btn.disabled = false;
-            }
+            } catch (err) { alert(err.message); }
+            finally { btn.innerText = "Добавить товар"; btn.disabled = false; }
         }
 
         function addNewProduct() {
@@ -346,32 +436,15 @@
             const stockValue = parseFloat(document.getElementById('prodBoxes').value) || 0;
             const unitType = document.getElementById('prodUnitType').value;
             const fileInput = document.getElementById('prodImage');
-            const btn = document.getElementById('addBtn');
-
             if(!title || !price) { alert("Заполните поля!"); return; }
 
-            btn.innerText = "Загрузка изображения оригинального качества...";
-            btn.disabled = true;
-
+            document.getElementById('addBtn').disabled = true;
             const defaultImg = "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=80";
 
             if (fileInput.files && fileInput.files[0]) {
                 let reader = new FileReader();
                 reader.onload = function(e) {
-                    let imgEl = new Image();
-                    imgEl.onload = function() {
-                        let canvas = document.createElement('canvas');
-                        let ctx = canvas.getContext('2d');
-                        
-                        // Сохраняем оригинальные размеры картинки (никакого размытия и жесткого сжатия)
-                        canvas.width = imgEl.width;
-                        canvas.height = imgEl.height;
-                        ctx.drawImage(imgEl, 0, 0, imgEl.width, imgEl.height);
-                        
-                        let hdDataUrl = canvas.toDataURL('image/jpeg', 0.95);
-                        saveProductToSupabase(title, category, price, stockValue, unitType, hdDataUrl);
-                    };
-                    imgEl.src = e.target.result;
+                    saveProductToSupabase(title, category, price, stockValue, unitType, e.target.result);
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
@@ -385,98 +458,54 @@
 
         function renderCatalog() {
             const grid = document.getElementById('catalogGrid');
-            if(products.length === 0) {
-                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888;">Каталог пуст.</p>`;
-                return;
-            }
+            if(products.length === 0) { grid.innerHTML = `<p style="text-align:center;">Пусто.</p>`; return; }
             grid.innerHTML = products.map(p => {
                 const totalStock = parseFloat(p.boxes_count || 0);
-                const alreadyInCart = getQtyInCart(p.id);
-                const availableStock = totalStock - alreadyInCart;
+                const availableStock = totalStock - getQtyInCart(p.id);
                 const unit = p.pcs_per_box === 0 ? 'кор.' : 'шт.';
-
-                const deleteButtonHtml = isAdminLoggedIn 
-                    ? `<button class="admin-delete-btn" onclick="deleteProduct(${p.id}, '${p.name}')"><i class="fas fa-trash"></i></button>` 
-                    : '';
-
-                // ПОКУПАТЕЛЬ и АДМИН видят чистый остаток товара после продаж
-                const stockUiForUser = `
-                    <div class="product-stock">
-                        <i class="fas fa-warehouse"></i> На складе осталось: <b>${availableStock}</b> ${unit}
-                    </div>`;
-
-                // АДМИНУ дополнительно выводим интерактивный будущий расчет остатка
-                const stockUiForAdmin = `
-                    <div class="product-stock">
-                        <i class="fas fa-warehouse"></i> На складе осталось: <b>${availableStock}</b> ${unit}
-                        <span class="stock-future" id="future-${p.id}">
-                            <i class="fas fa-calculator"></i> Будет остаток: ${availableStock} ${unit}
-                        </span>
-                    </div>`;
+                
+                // КНОПКИ КУРАТОРСТВА ДЛЯ АДМИНА (УДАЛИТЬ + ПОПОЛНИТЬ)
+                const adminControls = isAdminLoggedIn ? `
+                    <div class="admin-controls-badges">
+                        <button class="admin-refill-btn" title="Пополнить склад" onclick="refillProductStock(${p.id}, ${totalStock}, '${p.name}', '${unit}')"><i class="fas fa-plus"></i></button>
+                        <button class="admin-delete-btn" title="Удалить" onclick="deleteProduct(${p.id}, '${p.name}')"><i class="fas fa-trash"></i></button>
+                    </div>` : '';
 
                 return `
                 <div class="product-card">
-                    ${deleteButtonHtml}
-                    <div class="product-img-box">
-                        <img src="${p.image_url || 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=80'}" alt="${p.name}">
-                    </div>
+                    ${adminControls}
+                    <div class="product-img-box"><img src="${p.image_url || ''}"></div>
                     <div class="product-info">
                         <div>
                             <div class="product-category">${p.description}</div>
                             <h3 class="product-title">${p.name}</h3>
-                            ${isAdminLoggedIn ? stockUiForAdmin : stockUiForUser}
+                            <div class="product-stock">Осталось: <b>${availableStock}</b> ${unit}</div>
                         </div>
                         <div>
                             <div class="product-price">${p.price} TJS</div>
-                            
                             <div class="purchase-selector">
-                                <span style="font-size:13px; align-self:center; color:#555;">Выбрать кол-во (${unit}):</span>
-                                <input type="number" id="qty-${p.id}" value="1" min="1" oninput="previewStockChange(${p.id}, ${availableStock}, '${unit}')">
+                                <span>Кол-во:</span>
+                                <input type="number" id="qty-${p.id}" value="1" min="1">
                             </div>
-
                             <button class="btn-add-to-cart" onclick="addToCart(${p.id}, ${availableStock}, '${unit}')">В корзину</button>
                         </div>
                     </div>
-                </div>
-                `;
+                </div>`;
             }).join('');
-        }
-
-        function previewStockChange(id, availableStock, unit) {
-            if (!isAdminLoggedIn) return; 
-            const orderQty = parseInt(document.getElementById(`qty-${id}`).value) || 0;
-            const futureLeft = availableStock - orderQty;
-            const displayEl = document.getElementById(`future-${id}`);
-
-            if (futureLeft < 0) {
-                displayEl.style.color = "var(--danger)";
-                displayEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Дефицит на складе!`;
-            } else {
-                displayEl.style.color = "var(--success)";
-                displayEl.innerHTML = `<i class="fas fa-calculator"></i> Будет остаток: ${futureLeft} ${unit}`;
-            }
         }
 
         function addToCart(id, availableStock, unit) {
             const item = products.find(p => p.id === id);
-            if (!item) return;
-
             const orderQty = parseInt(document.getElementById(`qty-${id}`).value) || 1;
-            if (orderQty > availableStock) {
-                alert(`Недостаточно товара! Доступно: ${availableStock} ${unit}`);
-                return;
-            }
-
-            const calculatedPrice = (parseFloat(item.price) || 0) * orderQty;
+            if (orderQty > availableStock) { alert("Нет столько на складе!"); return; }
 
             cart.push({
                 ...item,
                 cartName: `${item.name} (${orderQty} ${unit})`,
-                cartPrice: calculatedPrice,
+                cartPrice: item.price * orderQty,
                 selectedQty: orderQty,
                 unitType: unit
             });
-
             updateCartUI();
             renderCatalog();
             document.getElementById('cartSection').style.display = 'block';
@@ -486,43 +515,26 @@
             const totalSum = cart.reduce((sum, item) => sum + item.cartPrice, 0);
             const cashInput = document.getElementById('cashGiven').value.trim();
             const resultBox = document.getElementById('debtResultBox');
+            if (!cashInput) { resultBox.style.display = "none"; return; }
 
-            if (!cashInput) {
-                resultBox.style.display = "none";
-                return;
-            }
-
-            const cashGiven = parseFloat(cashInput) || 0;
-            const debt = totalSum - cashGiven;
-
+            const debt = totalSum - parseFloat(cashInput);
             if (debt > 0) {
                 resultBox.className = "debt-alert-box warning";
-                resultBox.innerHTML = `⚠️ ЧЁТКИЙ РАСЧЕТ ДОЛГА ПОКУПАТЕЛЯ: Вы должны будете оплатить в долг / рассрочку: <b>${debt} TJS</b>`;
-            } else if (debt < 0) {
-                resultBox.className = "debt-alert-box success";
-                resultBox.innerHTML = `✅ Оплачено полностью. Сдача покупателю: <b>${Math.abs(debt)} TJS</b>`;
+                resultBox.innerHTML = `⚠️ Клиент должен: <b>${debt} TJS</b>`;
             } else {
                 resultBox.className = "debt-alert-box success";
-                resultBox.innerHTML = `✅ Оплачено на 100%. Долгов нет!`;
+                resultBox.innerHTML = `✅ Долгов нет! Сдача: ${Math.abs(debt)} TJS`;
             }
         }
 
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.length;
-            const container = document.getElementById('cartItemsContainer');
-            
-            container.innerHTML = cart.map((item, index) => `
+            document.getElementById('cartItemsContainer').innerHTML = cart.map((item, index) => `
                 <div class="cart-item">
-                    <div class="cart-item-details">
-                        <h4>${item.cartName}</h4>
-                        <p>${item.cartPrice} TJS</p>
-                    </div>
+                    <div class="cart-item-details"><h4>${item.cartName}</h4><p>${item.cartPrice} TJS</p></div>
                     <button class="remove-item" onclick="removeFromCart(${index})"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            `).join('');
-
-            const total = cart.reduce((sum, item) => sum + item.cartPrice, 0);
-            document.getElementById('cartTotalSum').innerText = `Итого к оплате: ${total} TJS`;
+                </div>`).join('');
+            document.getElementById('cartTotalSum').innerText = `Итого: ${cart.reduce((sum, item) => sum + item.cartPrice, 0)} TJS`;
             calculateDebt();
         }
 
@@ -533,71 +545,103 @@
             if(cart.length === 0) document.getElementById('cartSection').style.display = 'none';
         }
 
-        function scrollToCart() {
-            if(cart.length > 0) document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth' });
+        function scrollToCart() { if(cart.length > 0) document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth' }); }
+        function toggleDailyReport() { const b = document.getElementById('dailyReportBlock'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; buildDailyReport(); }
+        function adminCopyCheck(checkNum) { navigator.clipboard.writeText(checkNum); alert(`Чек "${checkNum}" скопирован!`); }
+        
+        function openCheckModal(imgSrc) {
+            document.getElementById('modalTargetImg').src = imgSrc;
+            document.getElementById('imageModal').style.display = "flex";
         }
+        function closeCheckModal() { document.getElementById('imageModal').style.display = "none"; }
 
-        function toggleDailyReport() {
-            const block = document.getElementById('dailyReportBlock');
-            block.style.display = block.style.display === 'block' ? 'none' : 'block';
-            buildDailyReport();
-        }
-
-        // Логика формирования отчета дня для админа
         function buildDailyReport() {
             const summaryBox = document.getElementById('reportSummary');
             const tableBody = document.getElementById('reportTableBody');
+            if (dailyOrdersLog.length === 0) { tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Нет данных.</td></tr>`; return; }
 
-            if (dailyOrdersLog.length === 0) {
-                summaryBox.innerHTML = `<p style="color:#666;">За сегодня операций еще не проводилось.</p>`;
-                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Нет данных.</td></tr>`;
-                return;
-            }
-
-            let totalBoxesSold = 0;
-            let totalPcsSold = 0;
-            let totalRevenue = 0;
-            let totalDebtsSum = 0;
-            let rowsHtml = '';
-
+            let totalRevenue = 0, totalDebts = 0, rowsHtml = '';
             dailyOrdersLog.forEach(order => {
-                totalRevenue += order.total;
-                totalDebtsSum += order.debt;
-
-                order.items.forEach(item => {
-                    if (item.unitType === 'кор.') totalBoxesSold += item.qty;
-                    if (item.unitType === 'шт.') totalPcsSold += item.qty;
-                });
-
-                const itemsList = order.items.map(i => `${i.name} (${i.qty} ${i.unit})`).join(', ');
+                totalRevenue += order.total; totalDebts += order.debt;
+                const itemsList = order.items.map(i => `${i.name}`).join(', ');
+                
+                let actionBtns = '<span>Нал</span>';
+                if(order.payMethod !== "Наличные") {
+                    actionBtns = `<button class="btn-check-verify copy-btn" onclick="adminCopyCheck('${order.checkNo}')"><i class="fas fa-copy"></i></button>`;
+                    if(order.screenshotSrc) {
+                        actionBtns += `<button class="btn-check-verify view-btn" onclick="openCheckModal('${order.screenshotSrc}')"><i class="fas fa-image"></i> Чек</button>`;
+                    }
+                }
 
                 rowsHtml += `
                     <tr>
                         <td>${order.time}</td>
                         <td><b>${order.client}</b><br><small>${order.phone}</small></td>
                         <td>${itemsList}</td>
-                        <td><b>${order.total} TJS</b></td>
-                        <td>${order.cash} TJS</td>
-                        <td style="color: ${order.debt > 0 ? 'red' : 'green'}; font-weight:bold;">${order.debt > 0 ? order.debt + ' TJS' : 'Нет'}</td>
-                    </tr>
-                `;
+                        <td>${order.total} TJS<br><small style="color:red">Долг: ${order.debt}</small></td>
+                        <td><b>${order.payMethod}</b><br>Чек: ${order.checkNo || 'Нет'}</td>
+                        <td>${actionBtns}</td>
+                    </tr>`;
+            });
+            summaryBox.innerHTML = `• Продано на: <b>${totalRevenue} TJS</b> | Долги: <b style="color:red">${totalDebts} TJS</b>`;
+            tableBody.innerHTML = rowsHtml;
+        }
+
+        function sendDailyReportToTelegram() {
+            const btn = document.getElementById('sendTgReportBtn');
+            if (dailyOrdersLog.length === 0) {
+                alert("Сегодня еще не было продаж. Отчет пуст!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Отправка отчета...";
+
+            let totalRevenue = 0;
+            let totalDebts = 0;
+            let ordersDetailsText = '';
+
+            dailyOrdersLog.forEach((order, index) => {
+                totalRevenue += order.total;
+                totalDebts += order.debt;
+                const itemsList = order.items.map(i => i.name).join(', ');
+                
+                ordersDetailsText += `📦 *Заказ №${index + 1} (${order.time})*\n• Клиент: ${order.client} (${order.phone})\n• Товары: ${itemsList}\n• Оплата: ${order.payMethod} (Чек: ${order.checkNo || 'нет'})\n• Сумма: ${order.total} TJS | Долг: ${order.debt} TJS\n\n`;
             });
 
-            summaryBox.innerHTML = `
-                <div style="background:#fff; padding:15px; border-radius:6px; margin-bottom:15px; border-left:4px solid #3f51b5; line-height:1.6;">
-                    • Всего продано товара за день: <b>${totalBoxesSold} кор.</b> и <b>${totalPcsSold} шт.</b><br>
-                    • Общая сумма продаж: <b style="color:var(--primary); font-size:16px;">${totalRevenue} TJS</b><br>
-                    • Сумма незакрытых долгов клиентов: <b style="color:red; font-size:16px;">${totalDebtsSum} TJS</b>
-                </div>
-            `;
-            tableBody.innerHTML = rowsHtml;
+            const dateStr = new Date().toLocaleDateString();
+            let finalReportMessage = `📊 **ФИНАНСОВЫЙ ОТЧЕТ FRESHLIFE ЗА ${dateStr}**\n\n`;
+            finalReportMessage += `📈 **Общая касса:** ${totalRevenue} TJS\n`;
+            finalReportMessage += `⚠️ **Общая сумма долгов:** ${totalDebts} TJS\n`;
+            finalReportMessage += `───────────────────\n\n`;
+            finalReportMessage += ordersDetailsText;
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: finalReportMessage,
+                    parse_mode: 'Markdown'
+                })
+            })
+            .then(res => {
+                if (res.ok) {
+                    alert("Отличная работа! Сводный отчет за день успешно улетел в Telegram.");
+                } else {
+                    alert("Ошибка при отправке отчета в API Telegram.");
+                }
+            })
+            .catch(() => alert("Ошибка соединения при отправке отчета."))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fab fa-telegram-plane"></i> 📊 Отправить отчёт дня в Telegram`;
+            });
         }
 
         async function updateStockInSupabase() {
             for (let item of cart) {
-                const currentStock = parseFloat(item.boxes_count || 0);
-                const newStock = currentStock - item.selectedQty;
-                await _supabase.from('perfumes').update({ boxes_count: newStock }).eq('id', item.id);
+                await _supabase.from('perfumes').update({ boxes_count: (item.boxes_count - item.selectedQty) }).eq('id', item.id);
             }
         }
 
@@ -605,62 +649,72 @@
             const name = document.getElementById('buyerName').value.trim();
             const phone = document.getElementById('buyerPhone').value.trim();
             const cashInput = document.getElementById('cashGiven').value.trim();
+            const payMethod = document.getElementById('paymentMethod').value;
+            const checkNo = document.getElementById('paymentCheckNumber').value.trim();
+            const screenInput = document.getElementById('paymentScreenshot');
             const orderBtn = document.getElementById('submitOrderBtn');
 
-            if(!name || !phone) { alert("Заполните личные данные!"); return; }
+            if(!name || !phone) { alert("Заполните поля имени и телефона!"); return; }
+            if(payMethod !== "Наличные" && !screenInput.files[0]) { alert("Пожалуйста, прикрепите скриншот чека из приложения!"); return; }
 
-            orderBtn.innerText = "Оформление заказа...";
+            orderBtn.innerText = "Отправка чека...";
             orderBtn.disabled = true;
 
             let totalSum = cart.reduce((sum, item) => sum + item.cartPrice, 0);
             let cashGiven = cashInput ? parseFloat(cashInput) : totalSum;
             let debtValue = Math.max(0, totalSum - cashGiven);
+            const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-            // Сохраняем заказ в локальную память для отчета дня администратора
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            dailyOrdersLog.push({
-                time: timeStr,
-                client: name,
-                phone: phone,
-                total: totalSum,
-                cash: cashGiven,
-                debt: debtValue,
-                items: cart.map(c => ({ name: c.name, qty: c.selectedQty, unit: c.unitType, unitType: c.unitType }))
-            });
+            let message = `🔔 **НОВЫЙ ЗАКАЗ FreshLife**\n\n👤 **Покупатель:** ${name}\n📞 **Телефон:** ${phone}\n💳 **Способ:** ${payMethod}\n🧾 **Чек №:** ${checkNo || 'Не указан'}\n💰 **Итого:** ${totalSum} TJS\n💵 **Внесено:** ${cashGiven} TJS\n⚠️ **Долг:** ${debtValue} TJS`;
 
-            let debtStatusText = debtValue > 0 ? `⚠️ **ДОЛГ КЛИЕНТА: ${debtValue} TJS**` : "❌ Нет долгов";
+            const processOrder = (screenshotBase64) => {
+                updateStockInSupabase().then(() => {
+                    let url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+                    let bodyPayload = JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' });
 
-            let message = `🔔 **ЗАКАЗ FreshLife**\n\n👤 **Покупатель:** ${name}\n📞 **Телефон:** ${phone}\n\n📦 **Товары:**\n`;
-            cart.forEach((item, i) => { message += `${i+1}. ${item.cartName} — ${item.cartPrice} TJS\n`; });
-            message += `\n💰 **Всего:** ${totalSum} TJS\n💵 **Внесено:** ${cashGiven} TJS\n📝 **Статус:** ${debtStatusText}`;
+                    if(screenshotBase64) {
+                        url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+                        const formData = new FormData();
+                        formData.append('chat_id', TELEGRAM_CHAT_ID);
+                        formData.append('caption', message);
+                        
+                        const byteString = atob(screenshotBase64.split(',')[1]);
+                        const mimeString = screenshotBase64.split(',')[0].split(':')[1].split(';')[0];
+                        const ab = new ArrayBuffer(byteString.length);
+                        const ia = new Uint8Array(ab);
+                        for (let i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
+                        const blob = new Blob([ab], {type: mimeString});
 
-            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
-            })
-            .then(async response => {
-                if(response.ok) {
-                    await updateStockInSupabase();
-                    alert("Успешно ждите ответ.");
-                    cart = [];
-                    updateCartUI();
-                    document.getElementById('cartSection').style.display = 'none';
-                    document.getElementById('cashGiven').value = "";
-                    await loadProductsFromCloud();
-                    if (document.getElementById('dailyReportBlock').style.display === 'block') {
-                        buildDailyReport();
+                        formData.append('photo', blob, 'receipt.jpg');
+
+                        return fetch(url, { method: 'POST', body: formData });
+                    } else {
+                        return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: bodyPayload });
                     }
-                } else {
-                    alert("Ошибка отправки в Telegram.");
-                }
-            })
-            .finally(() => {
-                orderBtn.innerHTML = `<i class="fab fa-telegram-plane"></i> Оформить заказ`;
-                orderBtn.disabled = false;
-            });
+                })
+                .then(res => {
+                    if(res.ok) {
+                        dailyOrdersLog.push({
+                            time: timeStr, client: name, phone: phone, total: totalSum, debt: debtValue, payMethod: payMethod, checkNo: checkNo, screenshotSrc: screenshotBase64, items: cart.map(c => ({ name: c.name }))
+                        });
+                        alert("Заказ принят! Скриншот чека отправлен Худоер.");
+                        cart = []; updateCartUI();
+                        document.getElementById('cartSection').style.display = 'none';
+                        loadProductsFromCloud();
+                        buildDailyReport();
+                    } else { alert("Ошибка отправки."); }
+                })
+                .catch(() => alert("Произошла ошибка."))
+                .finally(() => { orderBtn.innerHTML = `<i class="fab fa-telegram-plane"></i> Оформить заказ`; orderBtn.disabled = false; });
+            };
+
+            if (screenInput.files && screenInput.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) { processOrder(e.target.result); };
+                reader.readAsDataURL(screenInput.files[0]);
+            } else {
+                processOrder(null);
+            }
         }
 
         loadProductsFromCloud();
