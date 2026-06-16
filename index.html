@@ -68,7 +68,7 @@
         .products { padding: 60px 5%; max-width: 1400px; margin: 0 auto; }
         .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: var(--primary); position: relative; }
         .section-title::after { content: ''; display: block; width: 50px; height: 3px; background: var(--accent); margin: 10px auto 0; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .product-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: var(--transition); display: flex; flex-direction: column; }
         .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
         .product-img-box { height: 340px; background: #eee; position: relative; overflow: hidden; }
@@ -80,6 +80,11 @@
         .product-stock { font-size: 13px; color: #555; background: #f0f3f1; padding: 6px 10px; border-radius: 6px; margin-bottom: 15px; border-left: 3px solid var(--primary); text-align: left; }
         .product-price { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
         
+        /* Блок выбора количества и типа покупки */
+        .purchase-selector { display: flex; gap: 8px; margin-bottom: 15px; }
+        .purchase-selector select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; }
+        .purchase-selector input { width: 70px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; text-align: center; }
+
         .btn-add-to-cart { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); }
         .btn-add-to-cart:hover { background: var(--accent); color: var(--primary); }
 
@@ -87,7 +92,7 @@
         .cart-title { font-size: 22px; margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--light); padding-bottom: 10px; font-weight: 700; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
         .cart-item-details h4 { font-size: 16px; color: var(--dark); }
-        .cart-item-details p { color: var(--accent); font-weight: 600; margin-top: 4px; }
+        .cart-item-details p { color: var(--accent); font-weight: 600; margin-top: 4px; font-size: 14px; }
         .remove-item { color: #ff4d4d; cursor: pointer; background: none; border: none; font-size: 18px; transition: var(--transition); }
         .cart-total { text-align: right; font-size: 22px; font-weight: 700; margin: 20px 0; color: var(--primary); }
         
@@ -149,7 +154,7 @@
                 <input type="number" id="prodPcsPerBox" value="0" min="0" oninput="updateAdminTotalPcs()">
             </div>
             <div>
-                <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Цена (в сомони):</label>
+                <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Цена за 1 ШТУКУ (в сомони):</label>
                 <input type="number" id="prodPrice" placeholder="Цена в TJS">
             </div>
             <div style="grid-column: 1 / -1; margin-top: 5px; font-weight: 600; color: var(--primary); font-size: 14px;" id="adminTotalDisplay">
@@ -246,7 +251,6 @@
             const title = titleInput.value.trim();
             const category = catInput.value;
             
-            // ИСПРАВЛЕНО: Строгие преобразования типов данных text -> number
             const price = parseFloat(priceInput.value) || 0;
             const boxes = parseInt(boxesInput.value) || 0;
             const pcs_per_box = parseInt(pcsInput.value) || 0;
@@ -297,7 +301,6 @@
         async function saveProductToSupabase(title, category, price, boxes, pcs_per_box, imageSrc) {
             const btn = document.getElementById('addBtn');
             try {
-                // ИСПРАВЛЕНО: Теперь в базу данных улетают чистые типы int и float вместо строк
                 const { data, error } = await _supabase.from('perfumes').insert([
                     { 
                         name: title, 
@@ -311,7 +314,6 @@
                 
                 if (error) throw error;
 
-                // Очистка формы после успешного добавления
                 document.getElementById('prodTitle').value = "";
                 document.getElementById('prodPrice').value = "";
                 document.getElementById('prodImage').value = "";
@@ -353,7 +355,16 @@
                             </div>
                         </div>
                         <div>
-                            <div class="product-price">${p.price || 0} TJS</div>
+                            <div class="product-price">${p.price || 0} TJS / шт.</div>
+                            
+                            <div class="purchase-selector">
+                                <select id="type-${p.id}">
+                                    <option value="pcs">Штука (шт.)</option>
+                                    <option value="boxes">Коробка (кор.)</option>
+                                </select>
+                                <input type="number" id="qty-${p.id}" value="1" min="1">
+                            </div>
+
                             <button class="btn-add-to-cart" onclick="addToCart(${p.id})">В корзину</button>
                         </div>
                     </div>
@@ -365,7 +376,31 @@
         function addToCart(id) {
             const item = products.find(p => p.id === id);
             if (item) {
-                cart.push(item);
+                const orderType = document.getElementById(`type-${id}`).value;
+                const orderQty = parseInt(document.getElementById(`qty-${id}`).value) || 1;
+                const pcsInBox = parseInt(item.pcs_per_box) || 1;
+
+                let calculatedPrice = parseFloat(item.price) || 0;
+                let displayName = item.name;
+
+                if (orderType === 'boxes') {
+                    calculatedPrice = calculatedPrice * pcsInBox * orderQty;
+                    displayName += ` (${orderQty} кор. по ${pcsInBox} шт.)`;
+                } else {
+                    calculatedPrice = calculatedPrice * orderQty;
+                    displayName += ` (${orderQty} шт.)`;
+                }
+
+                // Клонируем объект, чтобы сохранить уникальные параметры этой позиции в корзине
+                const cartItem = {
+                    ...item,
+                    cartName: displayName,
+                    cartPrice: calculatedPrice,
+                    selectedQty: orderQty,
+                    selectedType: orderType === 'boxes' ? 'кор.' : 'шт.'
+                };
+
+                cart.push(cartItem);
                 updateCartUI();
                 document.getElementById('cartSection').style.display = 'block';
             }
@@ -378,14 +413,14 @@
             container.innerHTML = cart.map((item, index) => `
                 <div class="cart-item">
                     <div class="cart-item-details">
-                        <h4>${item.name || 'Парфюм'}</h4>
-                        <p>${item.price || 0} TJS</p>
+                        <h4>${item.cartName}</h4>
+                        <p>${item.cartPrice} TJS</p>
                     </div>
                     <button class="remove-item" onclick="removeFromCart(${index})"><i class="fas fa-trash-alt"></i></button>
                 </div>
             `).join('');
 
-            const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+            const total = cart.reduce((sum, item) => sum + item.cartPrice, 0);
             document.getElementById('cartTotalSum').innerText = `Итого: ${total} TJS`;
         }
 
@@ -412,10 +447,12 @@
                 return;
             }
 
-            let totalSum = cart.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+            let totalSum = cart.reduce((sum, item) => sum + item.cartPrice, 0);
             let message = `🔔 **НОВЫЙ ЗАКАЗ [FreshLife 2.0]**\n\n👤 **Покупатель:** ${name}\n📞 **Телефон:** ${phone}\n\n📦 **Товары:**\n`;
             
-            cart.forEach((item, i) => { message += `${i+1}. ${item.name} — ${item.price} TJS\n`; });
+            cart.forEach((item, i) => { 
+                message += `${i+1}. ${item.cartName} — ${item.cartPrice} TJS\n`; 
+            });
             message += `\n💰 **Сумма заказа:** ${totalSum} TJS`;
 
             const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -440,7 +477,6 @@
             .catch(err => { console.error(err); alert("Ошибка сети."); });
         }
 
-        // Автоматический старт загрузки данных при открытии страницы
         loadProductsFromCloud();
     </script>
 </body>
