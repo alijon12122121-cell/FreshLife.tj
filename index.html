@@ -332,17 +332,22 @@
             <!-- БЛОК ОПОВЕЩЕНИЯ О ДОЛГЕ С ПРЕДУПРЕЖДЕНИЕМ -->
             <div id="debtResultBox" class="debt-alert-box"></div>
         </div>
-
-        <div class="order-box">
-            <h4>Информация о доставке:</h4>
-            <div class="order-form">
-                <input type="text" id="buyerName" placeholder="Имя покупателя" required>
-                <input type="tel" id="buyerPhone" placeholder="Телефон (+992...)" required>
-                <button class="btn-order" id="submitOrderBtn" onclick="sendOrderToTelegram()">
-                    <i class="fab fa-telegram-plane"></i> Подтвердить заказ и отправить
-                </button>
-            </div>
+       <div class="order-box">
+    <h4 style="margin-bottom: 15px; color: var(--primary);">Информация о доставке:</h4>
+    <div class="order-form-vertical">
+        <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; display: block; margin-bottom: 5px; color: #64748b; font-weight: 600;">Ваше Имя:</label>
+            <input type="text" id="buyerName" placeholder="Введите имя покупателя" required style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px;">
         </div>
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 12px; display: block; margin-bottom: 5px; color: #64748b; font-weight: 600;">Номер телефона:</label>
+            <input type="tel" id="buyerPhone" placeholder="+992" value="+992" required style="width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px;">
+        </div>
+        <button class="btn-order" id="submitOrderBtn" onclick="sendOrderToTelegram()">
+            <i class="fab fa-telegram-plane"></i> Подтвердить заказ и отправить
+        </button>
+    </div>
+</div>
     </section>
 
     <!-- МОДАЛКА ПРОСМОТРА ЧЕКА -->
@@ -791,7 +796,23 @@ function updateCartUI() {
                 processOrder(null);
             }
         }
+<style>
+        .order-form-vertical {
+    display: flex;
+    flex-direction: column; /* Выстраивает элементы строго сверху вниз */
+}
 
+.order-form-vertical input {
+    width: 100%;
+    transition: var(--transition);
+}
+
+.order-form-vertical input:focus {
+    border-color: var(--primary);
+    outline: none;
+    background-color: #fff;
+        </style>
+}
         loadProductsFromCloud();
     </script>
 </body>
