@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshLife Parfum v7.4 | Пополнение склада онлайн</title>
+    <title>FreshLife Parfum v7.5 | Fintech Payment Experience</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -14,11 +14,11 @@
             --primary: #1a3a2a;
             --accent: #d4af37;
             --dark: #111111;
-            --light: #f9f9f9;
-            --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            --light: #f4f6f8;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --danger: #ff4d4d;
-            --success: #2e7d32;
-            --warning: #ff9800;
+            --success: #00c853;
+            --warning: #ffb300;
             --alif: #00b2a9;
             --dc: #ff5722;
         }
@@ -78,78 +78,124 @@
         .btn-check-verify:hover { opacity: 0.9; }
 
         .hero {
-            height: 35vh; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+            height: 25vh; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
             display: flex; align-items: center; justify-content: center; text-align: center; color: #fff; padding: 0 20px;
         }
-        .hero-content h1 { font-size: 3rem; margin-bottom: 15px; letter-spacing: 2px; }
+        .hero-content h1 { font-size: 2.5rem; margin-bottom: 10px; letter-spacing: 2px; }
 
-        .products { padding: 60px 5%; max-width: 1400px; margin: 0 auto; }
-        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: var(--primary); position: relative; }
+        .products { padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
+        .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 35px; color: var(--primary); position: relative; }
         .section-title::after { content: ''; display: block; width: 50px; height: 3px; background: var(--accent); margin: 10px auto 0; }
         .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .product-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: var(--transition); display: flex; flex-direction: column; position: relative; }
-        .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.08); }
         .product-img-box { height: 340px; background: #eee; position: relative; overflow: hidden; }
         .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
         
-        /* КНОПКИ КУРАТОРСТВА ТОВАРАМИ */
         .admin-controls-badges { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
-        .admin-delete-btn {
+        .admin-delete-btn, .admin-refill-btn {
             background: rgba(255, 77, 77, 0.95); color: white; border: none; border-radius: 50%; 
             width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: var(--transition); font-size: 16px;
         }
         .admin-delete-btn:hover { background: var(--danger); transform: scale(1.1); }
-        
-        .admin-refill-btn {
-            background: rgba(46, 125, 50, 0.95); color: white; border: none; border-radius: 50%; 
-            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: var(--transition); font-size: 16px;
-        }
+        .admin-refill-btn { background: rgba(46, 125, 50, 0.95); }
         .admin-refill-btn:hover { background: #1b5e20; transform: scale(1.1); }
 
         .product-info { padding: 25px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .product-category { font-size: 12px; text-transform: uppercase; color: #888; margin-bottom: 8px; letter-spacing: 1px; }
         .product-title { font-size: 19px; margin-bottom: 12px; color: var(--dark); font-weight: 600; }
-        
-        .product-stock { font-size: 14px; color: #333; background: #f0f3f1; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary); text-align: left; line-height: 1.5; }
-        
+        .product-stock { font-size: 14px; color: #333; background: #f0f3f1; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary); text-align: left; }
         .product-price { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
         
         .purchase-selector { display: flex; gap: 8px; margin-bottom: 15px; }
-        .purchase-selector select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; }
         .purchase-selector input { width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; text-align: center; }
 
         .btn-add-to-cart { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); }
         .btn-add-to-cart:hover { background: var(--accent); color: var(--primary); }
 
-        .cart-section { background: #fff; margin: 40px 5%; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: none; border-top: 4px solid var(--primary); }
-        .cart-title { font-size: 22px; margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--light); padding-bottom: 10px; font-weight: 700; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
-        .cart-item-details h4 { font-size: 16px; color: var(--dark); }
-        .cart-item-details p { color: var(--accent); font-weight: 600; margin-top: 4px; font-size: 14px; }
+        /* ЭФФЕКТНЫЙ БЛОК ОПЛАТЫ И КОРЗИНЫ */
+        .cart-section { background: #fff; margin: 40px auto; max-width: 900px; padding: 35px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.04); display: none; border: 1px solid #eef2f5; }
+        .cart-title { font-size: 24px; margin-bottom: 25px; color: var(--primary); border-bottom: 2px solid #f4f6f8; padding-bottom: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f4f6f8; }
+        .cart-item-details h4 { font-size: 16px; color: var(--dark); font-weight: 600; }
+        .cart-item-details p { color: var(--accent); font-weight: 700; margin-top: 4px; font-size: 14px; }
         .remove-item { color: var(--danger); cursor: pointer; background: none; border: none; font-size: 18px; transition: var(--transition); }
-        .cart-total { text-align: right; font-size: 22px; font-weight: 700; margin: 20px 0; color: var(--primary); }
+        .remove-item:hover { transform: scale(1.1); }
         
-        .cash-calculator { background: #fff9f0; padding: 18px; border-radius: 10px; margin-bottom: 25px; border: 1px dashed var(--warning); }
-        .cash-calculator h5 { color: var(--primary); margin-bottom: 12px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .cash-input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-        .cash-input-group label { font-size: 12px; color: #555; font-weight: 600; }
-        .cash-input-group input, .cash-input-group select { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; font-weight: 600; width: 100%; background: #fff; }
-        
-        .payment-info-box { background: #e3f2fd; padding: 14px; border-radius: 8px; margin-top: 8px; font-size: 14px; color: #0d47a1; border-left: 4px solid var(--dc); display: none; line-height: 1.5; }
+        .cart-total { text-align: right; font-size: 24px; font-weight: 700; margin: 25px 0; color: var(--primary); background: #f4f6f8; padding: 15px 25px; border-radius: 12px; }
 
-        .debt-alert-box { padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 700; line-height: 1.4; margin-top: 10px; display: none; }
-        .debt-alert-box.warning { background: #fff3e0; color: #e65100; border-left: 4px solid var(--warning); display: block; }
-        .debt-alert-box.success { background: #e8f5e9; color: var(--success); border-left: 4px solid var(--success); display: block; }
-
-        .order-box { max-width: 450px; background: var(--light); padding: 25px; border-radius: 10px; margin-top: 20px; }
-        .order-form { display: grid; gap: 15px; }
-        .order-form input { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        .btn-order { background: #25D366; color: #fff; padding: 14px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 16px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        /* ОПЛАТА: СТИЛЬ ФИНТЕХ СМАРТ-КАРТЫ */
+        .payment-experience-box { margin-top: 30px; }
+        .payment-method-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 25px; }
         
+        .method-card {
+            background: #fff; border: 2px solid #e2e8f0; border-radius: 14px; padding: 16px; text-align: center;
+            cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 8px; font-weight: 600; font-size: 13px;
+        }
+        .method-card i { font-size: 22px; color: #64748b; }
+        .method-card.active[data-method="Cash"] { border-color: var(--primary); background: #f0f7f4; color: var(--primary); }
+        .method-card.active[data-method="Alif"] { border-color: var(--alif); background: #e6f7f6; color: var(--alif); }
+        .method-card.active[data-method="DC"] { border-color: var(--dc); background: #fff2ed; color: var(--dc); }
+        .method-card.active i { color: inherit; }
+
+        /* ЭРА ЦИФРОВЫХ КАРТ */
+        .digital-bank-card-wrapper { display: none; perspective: 1000px; margin-bottom: 25px; }
+        .digital-bank-card {
+            width: 100%; max-width: 400px; height: 210px; margin: 0 auto; border-radius: 16px; padding: 25px;
+            color: white; display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15); position: relative; overflow: hidden;
+            transition: var(--transition); transform-style: preserve-3d;
+        }
+        .digital-bank-card::before {
+            content: ''; position: absolute; width: 300px; height: 300px; background: rgba(255,255,255,0.06);
+            border-radius: 50%; top: -100px; right: -100px; pointer-events: none;
+        }
+        .digital-bank-card.alif-style { background: linear-gradient(135deg, #00b2a9 0%, #007a74 100%); }
+        .digital-bank-card.dc-style { background: linear-gradient(135deg, #ff5722 0%, #d84315 100%); }
+        
+        .card-header-logo { display: flex; justify-content: space-between; align-items: center; }
+        .card-header-logo span { font-weight: 700; font-size: 18px; letter-spacing: 1px; }
+        .card-chip { width: 40px; height: 30px; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); border-radius: 6px; }
+        .card-number-holder { font-size: 20px; font-weight: 600; letter-spacing: 2px; margin: 15px 0 5px 0; text-align: center; background: rgba(0,0,0,0.15); padding: 8px; border-radius: 8px; }
+        .card-footer-info { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .btn-copy-card-num { background: rgba(255,255,255,0.25); border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 5px; }
+        .btn-copy-card-num:hover { background: rgba(255,255,255,0.4); }
+
+        /* ТУГМАИ СМАРИ СКРИНШОТ (DIGITAL RECEIPT SCANNER) */
+        .receipt-scanner-zone {
+            border: 2px dashed #cbd5e1; background: #f8fafc; padding: 30px; border-radius: 16px;
+            text-align: center; cursor: pointer; transition: var(--transition); position: relative; margin-bottom: 25px;
+        }
+        .receipt-scanner-zone:hover { border-color: var(--primary); background: #f1f5f9; }
+        .receipt-scanner-zone i { font-size: 40px; color: #94a3b8; margin-bottom: 12px; }
+        .receipt-scanner-zone.has-file { border-style: solid; border-color: var(--success); background: #f0fdf4; }
+        .receipt-scanner-zone.has-file i { color: var(--success); }
+        .receipt-scanner-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .preview-thumbnail-receipt { max-height: 80px; border-radius: 8px; margin-top: 10px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* ИНПУТҲОИ КАССА */
+        .cash-flex-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .cash-flex-inputs input { padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; font-weight: 600; width: 100%; transition: var(--transition); }
+        .cash-flex-inputs input:focus { border-color: var(--primary); outline: none; }
+
+        .debt-alert-box { padding: 14px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; line-height: 1.4; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .debt-alert-box.warning { background: #fff3e0; color: #e65100; border-left: 5px solid var(--warning); display: block; }
+        .debt-alert-box.success { background: #e8f5e9; color: var(--success); border-left: 5px solid var(--success); display: block; }
+
+        /* ОФОРМЛЕНИЕ */
+        .order-box { background: #f8fafc; padding: 25px; border-radius: 16px; margin-top: 25px; border: 1px solid #e2e8f0; }
+        .order-box h4 { font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 15px; color: var(--primary); }
+        .order-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .order-form input { padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; transition: var(--transition); }
+        .order-form input:focus { border-color: var(--primary); outline: none; }
+        .btn-order { background: #25D366; color: #fff; padding: 15px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 16px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; grid-column: 1 / -1; width: 100%; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.15); }
+        .btn-order:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(37, 211, 102, 0.25); }
+        
+        @media(max-width: 600px) { .order-form { grid-template-columns: 1fr; } }
+
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
-        .modal-content { max-width: 90%; max-height: 85vh; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
+        .modal-content { max-width: 90%; max-height: 85vh; border-radius: 8px; }
         .close-modal { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; }
 
         footer { background: var(--dark); color: #aaa; padding: 40px 5%; text-align: center; margin-top: 80px; font-size: 14px; border-top: 3px solid var(--accent); }
@@ -170,7 +216,8 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>FreshLife Parfum</h1>
+            <h1>FreshLife Parfum v7.5</h1>
+            <p>Эффектная оплата через кошельки Alif и Dushanbe City</p>
         </div>
     </section>
 
@@ -189,9 +236,9 @@
             <div>
                 <label style="font-size:12px; display:block; margin-bottom:5px; color:#666;">Категория:</label>
                 <select id="prodCat">
-                    <option value=""></option>
-                    <option value="For Her">For men</option>
-                    <option value="For Him">For women</option>
+                    <option value="Unisex">Unisex</option>
+                    <option value="For Her">For Her</option>
+                    <option value="For Him">For Him</option>
                 </select>
             </div>
             <div>
@@ -245,49 +292,79 @@
         <div class="product-grid" id="catalogGrid"></div>
     </section>
 
-    <!-- КОРЗИНА И РАСЧЕТ ДОЛГА -->
+    <!-- ИНТЕРФЕЙС КОРЗИНЫ И СМАРТ-ОПЛАТЫ -->
     <section class="cart-section" id="cartSection">
-        <div class="cart-title"><i class="fas fa-shopping-basket"></i> Ваша корзина</div>
+        <div class="cart-title"><i class="fas fa-shopping-basket"></i> Корзина покупателя</div>
         <div id="cartItemsContainer"></div>
-        <div class="cart-total" id="cartTotalSum">Итого: 0 TJS</div>
+        <div class="cart-total" id="cartTotalSum">Итого к оплате: 0 TJS</div>
 
-        <div class="cash-calculator">
-            <h5><i class="fas fa-wallet"></i> Способ оплаты и верификация:</h5>
+        <!-- ОПЛАТА PREMIUM UI -->
+        <div class="payment-experience-box">
+            <h3 style="font-size: 16px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; color: #475569;">Выберите способ оплаты:</h3>
             
-            <div class="cash-input-group" style="margin-bottom: 15px;">
-                <label>Выберите, как вы будете оплачивать:</label>
-                <select id="paymentMethod" onchange="handlePaymentMethodChange()">
-                    <option value="Наличные">Наличные (При встрече)</option>
-                    <option value="Через Алиф на мой DC">У меня кошелек Alif Mobi (Перевод на карту/кошелек DC)</option>
-                    <option value="Через DC на мой DC">У меня кошелек Dushanbe City (Прямой перевод)</option>
-                </select>
-                <div id="paymentDetailsBox" class="payment-info-box"></div>
+            <div class="payment-method-selector">
+                <div class="method-card active" data-method="Cash" onclick="selectPaymentMethod('Cash')">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Наличные</span>
+                </div>
+                <div class="method-card" data-method="Alif" onclick="selectPaymentMethod('Alif')">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Alif Mobi</span>
+                </div>
+                <div class="method-card" data-method="DC" onclick="selectPaymentMethod('DC')">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Dushanbe City</span>
+                </div>
             </div>
 
-            <div class="cash-input-group" id="checkNumberGroup" style="display:none; margin-bottom: 15px;">
-                <label id="checkLabel">Введите номер чека / транзакции:</label>
-                <input type="text" id="paymentCheckNumber" placeholder="Пример: 87452319">
+            <!-- ИНТЕРАКТИВНАЯ БАНКОВСКАЯ КАРТА ДЛЯ КЛИЕНТА -->
+            <div class="digital-bank-card-wrapper" id="bankCardWrapper">
+                <div class="digital-bank-card" id="digitalCardElement">
+                    <div class="card-header-logo">
+                        <span id="cardBankTitle">ALIF BANK</span>
+                        <div class="card-chip"></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px;">Перевод по номеру кошелька:</div>
+                        <div class="card-number-holder">+992 10 001 1209</div>
+                    </div>
+                    <div class="card-footer-info">
+                        <span>ФИО: Получатель платежа</span>
+                        <button class="btn-copy-card-num" onclick="copyWalletNumber()"><i class="fas fa-copy"></i> Скопировать</button>
+                    </div>
+                </div>
+                <p id="paymentStepInstruction" style="text-align: center; font-size: 12px; margin-top: 10px; color: #475569; font-weight: 500;"></p>
             </div>
 
-            <div class="cash-input-group" id="checkScreenshotGroup" style="display:none; margin-bottom: 15px;">
-                <label style="color: var(--dc); font-weight: bold;"><i class="fas fa-camera"></i> Обязательно прикрепите скриншот чека об оплате:</label>
-                <input type="file" id="paymentScreenshot" accept="image/*" style="padding: 8px;">
+            <!-- ИНПУТЫ И СКАНЕР ЧЕКА -->
+            <div class="cash-flex-inputs">
+                <div id="checkNumberInputGroup" style="display: none;">
+                    <input type="text" id="paymentCheckNumber" placeholder="Номер чека / ID транзакции">
+                </div>
+                <div>
+                    <input type="number" id="cashGiven" placeholder="Сколько сомони вносится сейчас?" oninput="calculateDebt()">
+                </div>
             </div>
 
-            <div class="cash-input-group">
-                <label>Сколько денег вносится СЕЙЧАС? (сомони):</label>
-                <input type="number" id="cashGiven" placeholder="Введите сумму оплаты" oninput="calculateDebt()">
+            <!-- ЭФФЕКТНЫЙ ДРОПЗОН-СКАНЕР ДЛЯ ЧЕКА -->
+            <div class="receipt-scanner-zone" id="scannerZone" style="display: none;">
+                <i class="fas fa-cloud-upload-alt" id="scannerIcon"></i>
+                <h4 id="scannerText" style="font-size: 14px; margin-bottom: 5px;">Прикрепите скриншот чека об оплате</h4>
+                <p style="font-size: 11px; color: #64748b;">Нажмите для выбора фотографии или перетащите файл</p>
+                <input type="file" id="paymentScreenshot" accept="image/*" onchange="previewUploadedReceipt(this)">
+                <img id="receiptPreviewImg" class="preview-thumbnail-receipt">
             </div>
+
             <div id="debtResultBox" class="debt-alert-box"></div>
         </div>
 
         <div class="order-box">
-            <h4>Оформление заказа:</h4>
+            <h4>Данные доставки:</h4>
             <div class="order-form">
-                <input type="text" id="buyerName" placeholder="Ваше имя / Имя клиента" required>
+                <input type="text" id="buyerName" placeholder="Ваше имя / Клиент" required>
                 <input type="tel" id="buyerPhone" placeholder="Номер телефона (+992...)" required>
                 <button class="btn-order" id="submitOrderBtn" onclick="sendOrderToTelegram()">
-                    <i class="fab fa-telegram-plane"></i> Оформить заказ
+                    <i class="fab fa-telegram-plane"></i> Подтвердить и оформить заказ
                 </button>
             </div>
         </div>
@@ -315,6 +392,7 @@
         let cart = [];
         let isAdminLoggedIn = false;
         let dailyOrdersLog = [];
+        let currentSelectedMethod = 'Cash';
 
         function updateAdminUnitLabel() {
             const type = document.getElementById('prodUnitType').value;
@@ -341,29 +419,60 @@
             }
         }
 
-        function handlePaymentMethodChange() {
-            const method = document.getElementById('paymentMethod').value;
-            const detailsBox = document.getElementById('paymentDetailsBox');
-            const checkGroup = document.getElementById('checkNumberGroup');
-            const screenshotGroup = document.getElementById('checkScreenshotGroup');
-            const checkLabel = document.getElementById('checkLabel');
+        // НОВАЯ ФУНКЦИЯ ДЛЯ ЭФФЕКТНОГО ВЫБОРА ОПЛАТЫ
+        function selectPaymentMethod(method) {
+            currentSelectedMethod = method;
+            document.querySelectorAll('.method-card').forEach(card => card.classList.remove('active'));
+            document.querySelector(`.method-card[data-method="${method}"]`).classList.add('active');
 
-            if (method !== "Наличные") {
-                detailsBox.style.display = "block";
-                checkGroup.style.display = "block";
-                screenshotGroup.style.display = "block";
-                
-                if (method === "Через Алиф на мой DC") {
-                    detailsBox.innerHTML = `📲 <b>Инструкция для Alif:</b> Переведите сумму на номер DC: <b>+992 10 001 1209</b>. Сделайте скриншот чека!`;
-                    checkLabel.innerText = "Введи номер чека / ID операции из приложения Алиф:";
-                } else {
-                    detailsBox.innerHTML = `📲 <b>Инструкция для DC:</b> Сделайте перевод на кошелек продавца по номеру: <b>+992 10 001 1209</b>. Сделайте скриншот!`;
-                    checkLabel.innerText = "Введи последние 4 цифры карты или номер чека DC:";
-                }
+            const cardWrapper = document.getElementById('bankCardWrapper');
+            const cardElement = document.getElementById('digitalCardElement');
+            const bankTitle = document.getElementById('cardBankTitle');
+            const instruction = document.getElementById('paymentStepInstruction');
+            const checkGroup = document.getElementById('checkNumberInputGroup');
+            const scannerZone = document.getElementById('scannerZone');
+
+            if (method === 'Cash') {
+                cardWrapper.style.display = 'none';
+                checkGroup.style.display = 'none';
+                scannerZone.style.display = 'none';
             } else {
-                detailsBox.style.display = "none";
-                checkGroup.style.display = "none";
-                screenshotGroup.style.display = "none";
+                cardWrapper.style.display = 'block';
+                checkGroup.style.display = 'block';
+                scannerZone.style.display = 'block';
+
+                if (method === 'Alif') {
+                    cardElement.className = 'digital-bank-card alif-style';
+                    bankTitle.innerText = 'ALIF MOBI';
+                    instruction.innerHTML = '📲 Откройте приложение <b>Alif Mobi</b>, сделайте перевод по указанному выше номеру, скопируйте ID операции и прикрепите чек.';
+                } else if (method === 'DC') {
+                    cardElement.className = 'digital-bank-card dc-style';
+                    bankTitle.innerText = 'DUSHANBE CITY';
+                    instruction.innerHTML = '💳 Откройте кошелек <b>Dushanbe City</b>, переведите на этот кошелек и сделайте скриншот экрана.';
+                }
+            }
+            calculateDebt();
+        }
+
+        function copyWalletNumber() {
+            navigator.clipboard.writeText('+992100011209');
+            alert('Рақами кошелёк нусхабардорӣ шуд: +992 10 001 1209');
+        }
+
+        function previewUploadedReceipt(input) {
+            const preview = document.getElementById('receiptPreviewImg');
+            const zone = document.getElementById('scannerZone');
+            const text = document.getElementById('scannerText');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'inline-block';
+                    zone.classList.add('has-file');
+                    text.innerText = '✅ Скриншот чека успешно загружен!';
+                }
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
@@ -384,32 +493,23 @@
             } catch (err) { alert("Ошибка"); }
         }
 
-        // НОВАЯ ФУНКЦИЯ: ИЗМЕНЕНИЕ И ПОПОЛНЕНИЕ СКЛАДА
         async function refillProductStock(id, currentStock, name, unit) {
             const addedValue = prompt(`Товар: "${name}"\nСейчас на складе: ${currentStock} ${unit}.\n\nСколько еще ${unit} добавить на склад?`);
-            if (addedValue === null) return; // Нажал отмену
+            if (addedValue === null) return;
             
             const countToAdd = parseFloat(addedValue);
             if (isNaN(countToAdd) || countToAdd <= 0) {
-                alert("Ошибка! Введите корректное число больше нуля.");
+                alert("Ошибка! Введите число больше нуля.");
                 return;
             }
 
             const newStockValue = currentStock + countToAdd;
-
             try {
-                const { error } = await _supabase
-                    .from('perfumes')
-                    .update({ boxes_count: newStockValue })
-                    .eq('id', id);
-
+                const { error } = await _supabase.from('perfumes').update({ boxes_count: newStockValue }).eq('id', id);
                 if (error) throw error;
-
-                alert(`Склад успешно пополнен! Теперь в наличии: ${newStockValue} ${unit}.`);
-                await loadProductsFromCloud(); // Перерисовать каталог с новыми данными
-            } catch (err) {
-                alert("Не удалось обновить склад: " + err.message);
-            }
+                alert(`Склад обновлен! В наличии: ${newStockValue} ${unit}.`);
+                await loadProductsFromCloud();
+            } catch (err) { alert("Ошибка: " + err.message); }
         }
 
         async function saveProductToSupabase(title, category, price, stockValue, unitType, imageSrc) {
@@ -464,7 +564,6 @@
                 const availableStock = totalStock - getQtyInCart(p.id);
                 const unit = p.pcs_per_box === 0 ? 'кор.' : 'шт.';
                 
-                // КНОПКИ КУРАТОРСТВА ДЛЯ АДМИНА (УДАЛИТЬ + ПОПОЛНИТЬ)
                 const adminControls = isAdminLoggedIn ? `
                     <div class="admin-controls-badges">
                         <button class="admin-refill-btn" title="Пополнить склад" onclick="refillProductStock(${p.id}, ${totalStock}, '${p.name}', '${unit}')"><i class="fas fa-plus"></i></button>
@@ -534,7 +633,7 @@
                     <div class="cart-item-details"><h4>${item.cartName}</h4><p>${item.cartPrice} TJS</p></div>
                     <button class="remove-item" onclick="removeFromCart(${index})"><i class="fas fa-trash-alt"></i></button>
                 </div>`).join('');
-            document.getElementById('cartTotalSum').innerText = `Итого: ${cart.reduce((sum, item) => sum + item.cartPrice, 0)} TJS`;
+            document.getElementById('cartTotalSum').innerText = `Итого к оплате: ${cart.reduce((sum, item) => sum + item.cartPrice, 0)} TJS`;
             calculateDebt();
         }
 
@@ -547,7 +646,7 @@
 
         function scrollToCart() { if(cart.length > 0) document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth' }); }
         function toggleDailyReport() { const b = document.getElementById('dailyReportBlock'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; buildDailyReport(); }
-        function adminCopyCheck(checkNum) { navigator.clipboard.writeText(checkNum); alert(`Чек "${checkNum}" скопирован!`); }
+        function adminCopyCheck(checkNum) { navigator.clipboard.writeText(checkNum); alert(`Скопировано!`); }
         
         function openCheckModal(imgSrc) {
             document.getElementById('modalTargetImg').src = imgSrc;
@@ -566,7 +665,7 @@
                 const itemsList = order.items.map(i => `${i.name}`).join(', ');
                 
                 let actionBtns = '<span>Нал</span>';
-                if(order.payMethod !== "Наличные") {
+                if(order.payMethod !== "Cash") {
                     actionBtns = `<button class="btn-check-verify copy-btn" onclick="adminCopyCheck('${order.checkNo}')"><i class="fas fa-copy"></i></button>`;
                     if(order.screenshotSrc) {
                         actionBtns += `<button class="btn-check-verify view-btn" onclick="openCheckModal('${order.screenshotSrc}')"><i class="fas fa-image"></i> Чек</button>`;
@@ -589,54 +688,28 @@
 
         function sendDailyReportToTelegram() {
             const btn = document.getElementById('sendTgReportBtn');
-            if (dailyOrdersLog.length === 0) {
-                alert("Сегодня еще не было продаж. Отчет пуст!");
-                return;
-            }
+            if (dailyOrdersLog.length === 0) { alert("Отчет пуст!"); return; }
 
-            btn.disabled = true;
-            btn.innerText = "Отправка отчета...";
-
-            let totalRevenue = 0;
-            let totalDebts = 0;
-            let ordersDetailsText = '';
+            btn.disabled = true; btn.innerText = "Отправка отчета...";
+            let totalRevenue = 0, totalDebts = 0, ordersDetailsText = '';
 
             dailyOrdersLog.forEach((order, index) => {
-                totalRevenue += order.total;
-                totalDebts += order.debt;
+                totalRevenue += order.total; totalDebts += order.debt;
                 const itemsList = order.items.map(i => i.name).join(', ');
-                
                 ordersDetailsText += `📦 *Заказ №${index + 1} (${order.time})*\n• Клиент: ${order.client} (${order.phone})\n• Товары: ${itemsList}\n• Оплата: ${order.payMethod} (Чек: ${order.checkNo || 'нет'})\n• Сумма: ${order.total} TJS | Долг: ${order.debt} TJS\n\n`;
             });
 
             const dateStr = new Date().toLocaleDateString();
-            let finalReportMessage = `📊 **ФИНАНСОВЫЙ ОТЧЕТ FRESHLIFE ЗА ${dateStr}**\n\n`;
-            finalReportMessage += `📈 **Общая касса:** ${totalRevenue} TJS\n`;
-            finalReportMessage += `⚠️ **Общая сумма долгов:** ${totalDebts} TJS\n`;
-            finalReportMessage += `───────────────────\n\n`;
-            finalReportMessage += ordersDetailsText;
+            let finalReportMessage = `📊 **ФИНАНСОВЫЙ ОТЧЕТ FRESHLIFE ЗА ${dateStr}**\n\n📈 **Общая касса:** ${totalRevenue} TJS\n⚠️ **Общая сумма долгов:** ${totalDebts} TJS\n───────────────────\n\n` + ordersDetailsText;
 
             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: finalReportMessage,
-                    parse_mode: 'Markdown'
-                })
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: finalReportMessage, parse_mode: 'Markdown' })
             })
-            .then(res => {
-                if (res.ok) {
-                    alert("Отличная работа! Сводный отчет за день успешно улетел в Telegram.");
-                } else {
-                    alert("Ошибка при отправке отчета в API Telegram.");
-                }
-            })
-            .catch(() => alert("Ошибка соединения при отправке отчета."))
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fab fa-telegram-plane"></i> 📊 Отправить отчёт дня в Telegram`;
-            });
+            .then(res => { if (res.ok) alert("Сводный отчет за день успешно отправлен!"); })
+            .catch(() => alert("Ошибка соединения."))
+            .finally(() => { btn.disabled = false; btn.innerHTML = `<i class="fab fa-telegram-plane"></i> 📊 Отправить отчёт дня в Telegram`; });
         }
 
         async function updateStockInSupabase() {
@@ -649,15 +722,14 @@
             const name = document.getElementById('buyerName').value.trim();
             const phone = document.getElementById('buyerPhone').value.trim();
             const cashInput = document.getElementById('cashGiven').value.trim();
-            const payMethod = document.getElementById('paymentMethod').value;
             const checkNo = document.getElementById('paymentCheckNumber').value.trim();
             const screenInput = document.getElementById('paymentScreenshot');
             const orderBtn = document.getElementById('submitOrderBtn');
 
             if(!name || !phone) { alert("Заполните поля имени и телефона!"); return; }
-            if(payMethod !== "Наличные" && !screenInput.files[0]) { alert("Пожалуйста, прикрепите скриншот чека из приложения!"); return; }
+            if(currentSelectedMethod !== "Cash" && !screenInput.files[0]) { alert("Пожалуйста, прикрепите скриншот чека из приложения!"); return; }
 
-            orderBtn.innerText = "Отправка чека...";
+            orderBtn.innerText = "Обработка платежа...";
             orderBtn.disabled = true;
 
             let totalSum = cart.reduce((sum, item) => sum + item.cartPrice, 0);
@@ -665,7 +737,9 @@
             let debtValue = Math.max(0, totalSum - cashGiven);
             const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-            let message = `🔔 **НОВЫЙ ЗАКАЗ FreshLife**\n\n👤 **Покупатель:** ${name}\n📞 **Телефон:** ${phone}\n💳 **Способ:** ${payMethod}\n🧾 **Чек №:** ${checkNo || 'Не указан'}\n💰 **Итого:** ${totalSum} TJS\n💵 **Внесено:** ${cashGiven} TJS\n⚠️ **Долг:** ${debtValue} TJS`;
+            let methodReadable = currentSelectedMethod === 'Alif' ? 'Alif Mobi' : (currentSelectedMethod === 'DC' ? 'Dushanbe City' : 'Наличные');
+
+            let message = `🔔 **НОВЫЙ ЗАКАЗ FreshLife**\n\n👤 **Покупатель:** ${name}\n📞 **Телефон:** ${phone}\n💳 **Способ:** ${methodReadable}\n🧾 **Чек №:** ${checkNo || 'Не указан'}\n💰 **Итого:** ${totalSum} TJS\n💵 **Внесено:** ${cashGiven} TJS\n⚠️ **Долг:** ${debtValue} TJS`;
 
             const processOrder = (screenshotBase64) => {
                 updateStockInSupabase().then(() => {
@@ -686,7 +760,6 @@
                         const blob = new Blob([ab], {type: mimeString});
 
                         formData.append('photo', blob, 'receipt.jpg');
-
                         return fetch(url, { method: 'POST', body: formData });
                     } else {
                         return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: bodyPayload });
@@ -695,17 +768,17 @@
                 .then(res => {
                     if(res.ok) {
                         dailyOrdersLog.push({
-                            time: timeStr, client: name, phone: phone, total: totalSum, debt: debtValue, payMethod: payMethod, checkNo: checkNo, screenshotSrc: screenshotBase64, items: cart.map(c => ({ name: c.name }))
+                            time: timeStr, client: name, phone: phone, total: totalSum, debt: debtValue, payMethod: methodReadable, checkNo: checkNo, screenshotSrc: screenshotBase64, items: cart.map(c => ({ name: c.name }))
                         });
-                        alert("Заказ принят! Скриншот чека отправлен Худоер.");
+                        alert("Заказ принят! Чек отправлен админу.");
                         cart = []; updateCartUI();
                         document.getElementById('cartSection').style.display = 'none';
                         loadProductsFromCloud();
                         buildDailyReport();
-                    } else { alert("Ошибка отправки."); }
+                    } else { alert("Ошибка отправки заказа."); }
                 })
                 .catch(() => alert("Произошла ошибка."))
-                .finally(() => { orderBtn.innerHTML = `<i class="fab fa-telegram-plane"></i> Оформить заказ`; orderBtn.disabled = false; });
+                .finally(() => { orderBtn.innerHTML = `<i class="fab fa-telegram-plane"></i> Подтвердить и оформить заказ`; orderBtn.disabled = false; });
             };
 
             if (screenInput.files && screenInput.files[0]) {
